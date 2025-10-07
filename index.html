@@ -1,0 +1,133 @@
+import { useState, useMemo } from "react";
+
+// --- 🔧 CONFIG (swap these with your final gopher image URLs) --- const IMG = { general: "https://placehold.co/600x300?text=Gopher+-+General", lawn: "https://placehold.co/600x300?text=Gopher+-+Lawn+%26+Outdoor", mechanic: "https://placehold.co/600x300?text=Gopher+-+Mobile+Mechanic", builds: "https://placehold.co/600x300?text=Gopher+-+Builds+%26+Construction", logo: "https://placehold.co/300x120?text=Gopher's+Handyman+Service", };
+
+// --- 💵 Pricing model (per‑unit where possible, else hourly @ $40) --- const RATE = 40; // $/hr const SERVICES = [ { key: "general", title: "General Handyman", hero: IMG.general, items: [ { id: "drywall_patch", name: "Drywall patch (small)", unit: "each", laborPerUnitHrs: 1.5, materials: 20 }, { id: "paint_touch", name: "Paint touch‑up (1 wall)", unit: "each", laborPerUnitHrs: 2, materials: 35 }, { id: "light_plumb", name: "Light plumbing (fixture)", unit: "each", laborPerUnitHrs: 2.5, materials: 15 }, { id: "light_elec", name: "Light electrical (fixture)", unit: "each", laborPerUnitHrs: 2.5, materials: 15 }, { id: "caulk", name: "Caulking / weatherstrip", unit: "opening", laborPerUnitHrs: 0.75, materials: 6 }, ], }, { key: "lawn", title: "Lawn & Outdoor", hero: IMG.lawn, items: [ { id: "power_wash", name: "Power washing", unit: "sq ft", laborPerUnitHrs: 0.006, materials: 0.06 }, { id: "gutter_clean", name: "Gutter clean (1‑story)", unit: "home", laborPerUnitHrs: 3, materials: 20 }, { id: "holiday_lights", name: "Holiday lights install", unit: "home", laborPerUnitHrs: 5, materials: 25 }, { id: "weed_edge", name: "Weed‑eat & edge", unit: "visit", laborPerUnitHrs: 1.5, materials: 3 }, ], }, { key: "mechanic", title: "Mobile Mechanic (Basic)", hero: IMG.mechanic, items: [ { id: "battery_swap", name: "Battery swap/jump", unit: "job", laborPerUnitHrs: 1, materials: 0 }, { id: "flat_fix", name: "Flat fix/air (where safe)", unit: "job", laborPerUnitHrs: 1, materials: 5 }, { id: "priority", name: "Same‑day priority (add‑on)", unit: "add‑on", laborPerUnitHrs: 0, materials: 0, percentAdd: 0.25 }, ], }, { key: "builds", title: "Builds & Construction", hero: IMG.builds, items: [ { id: "porch", name: "Build porch", unit: "sq ft", laborPerUnitHrs: 0.4, materials: 12 }, { id: "patio", name: "Build patio/flooring", unit: "sq ft", laborPerUnitHrs: 0.3, materials: 10 }, { id: "walkway", name: "Create walkway", unit: "ft", laborPerUnitHrs: 0.8, materials: 30 }, { id: "fence", name: "Fence build/repair", unit: "ft", laborPerUnitHrs: 0.6, materials: 22.5 }, { id: "flowerbed", name: "Flowerbed build", unit: "ft", laborPerUnitHrs: 0.8, materials: 20 }, { id: "raised_bed", name: "Raised garden bed", unit: "each", laborPerUnitHrs: 6, materials: 150 }, { id: "planter_box", name: "Planter box (wood)", unit: "each", laborPerUnitHrs: 4, materials: 100 }, ], }, ];
+
+function currency(n){return $${n.toFixed(2)}}
+
+export default function App(){ const [active, setActive] = useState("general"); const [cart, setCart] = useState([]); // {id, name, qty, laborHrs, materialsPerUnit, percentAdd} const [materialsMode, setMaterialsMode] = useState("customer"); // customer | gophers const [materialsExtra, setMaterialsExtra] = useState(0); // additional materials not in line items const [miles, setMiles] = useState(0); // beyond 15 miles $1/mi const [client, setClient] = useState({name:"", phone:"", address:""}); const [notes, setNotes] = useState("");
+
+const addItem = (svc, qty=1)=>{ setCart(prev => { const existing = prev.find(p=>p.id===svc.id); if(existing){ return prev.map(p=> p.id===svc.id? {...p, qty: p.qty + qty}: p) } return [...prev, { id: svc.id, name: svc.name, unit: svc.unit, qty, laborHrs: svc.laborPerUnitHrs, materialsPerUnit: svc.materials, percentAdd: svc.percentAdd||0 }] }) } const changeQty = (id, qty)=> setCart(prev=> prev.map(p=> p.id===id? {...p, qty: Math.max(1, qty)}: p)) const removeItem = (id)=> setCart(prev=> prev.filter(p=> p.id!==id))
+
+const lineTotals = useMemo(()=>{ return cart.map(line=>{ const labor = line.laborHrs * RATE * line.qty; const materials = (line.materialsPerUnit * 1.25) * line.qty; // +25% markup baked in per unit const base = labor + materials; const addPct = base * (line.percentAdd||0); return { ...line, labor, materials, addPct, total: base + addPct }; }) }, [cart])
+
+const subtotal = lineTotals.reduce((s,l)=> s + l.total, 0); const travel = Math.max(0, Number(miles)||0); const extraMaterials = materialsExtra * (materialsMode === "gophers" ? 1.25 : 1); // apply +25% if Gopher supplies const pickup = materialsMode === "gophers" && materialsExtra>0 ? 25 : 0; const grand = subtotal + travel + extraMaterials + pickup;
+
+const quoteText = ()=>{ const items = lineTotals.map(l=>• ${l.name} x${l.qty} (${l.unit}) — ${currency(l.total)}).join("\n"); const matLine = materialsMode === 'gophers' ? Extra materials by Gopher’s: ${currency(extraMaterials)} (incl. 25% markup) + Pickup ${currency(pickup)} : Extra materials by customer: ${currency(extraMaterials)}; return Gopher’s Handyman Service\nAppointment & Quote (Draft)\n\nClient: ${client.name} | ${client.phone}\nAddress: ${client.address}\n\nItems:\n${items || '(none yet)'}\n\nTravel (>$15mi): ${currency(travel)}\n${matLine}\n\nTotal: ${currency(grand)}\n\nNotes: ${notes} }
+
+const copy = async()=>{ try{ await navigator.clipboard.writeText(quoteText()); alert('Quote copied!'); }catch{ alert('Copy failed. You can select text and copy manually.'); } }
+
+const activeGroup = SERVICES.find(s=> s.key===active);
+
+return ( <div className="min-h-screen bg-amber-50 text-stone-900"> {/* Top Nav */} <header className="sticky top-0 z-40 bg-amber-100/80 backdrop-blur border-b border-amber-200"> <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3"> <img src={IMG.logo} alt="Gopher's logo" className="h-10 w-auto rounded"/> <div className="font-extrabold text-xl">Gopher’s Handyman Service</div> <div className="ml-auto text-sm text-stone-600 hidden sm:block">Alpharetta + 15mi • Text/Call: (555) 555‑5555</div> </div> </header>
+
+{/* Tabs */}
+  <nav className="max-w-6xl mx-auto px-2 pt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
+    {SERVICES.map(s=> (
+      <button key={s.key} onClick={()=>setActive(s.key)} className={`rounded-2xl px-3 py-2 font-semibold shadow ${active===s.key? 'bg-amber-500 text-white':'bg-white hover:bg-amber-100'}`}>
+        {s.title}
+      </button>
+    ))}
+  </nav>
+
+  {/* Section Hero with corresponding Gopher image */}
+  <section className="max-w-6xl mx-auto p-4">
+    <div className="bg-white rounded-2xl shadow overflow-hidden">
+      <img src={activeGroup.hero} alt={activeGroup.title} className="w-full h-48 object-cover"/>
+      <div className="p-4 sm:p-6">
+        <h2 className="text-2xl font-extrabold mb-2">{activeGroup.title}</h2>
+        <p className="text-stone-600 mb-4">Add services below to build your appointment and instant estimate. Materials are priced with a standard 25% handling when supplied by Gopher’s.</p>
+        <div className="divide-y">
+          {activeGroup.items.map(item=> (
+            <div key={item.id} className="flex items-center justify-between py-3 gap-3">
+              <div>
+                <div className="font-semibold">{item.name}</div>
+                <div className="text-xs text-stone-500">Unit: {item.unit} • Labor {item.laborPerUnitHrs}h / {item.unit} @ ${RATE}/hr • Materials est. ${item.materials} (+25% incl.)</div>
+              </div>
+              <button onClick={()=>addItem(item)} className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold shadow">Add</button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Cart & Quote */}
+  <main className="max-w-6xl mx-auto p-4 grid lg:grid-cols-3 gap-6">
+    <section className="lg:col-span-2 space-y-4">
+      <div className="bg-white rounded-2xl shadow p-4">
+        <h3 className="text-xl font-bold mb-3">Selected Items</h3>
+        {lineTotals.length===0 ? (
+          <div className="text-sm text-stone-500">No items yet. Choose a category above and tap Add.</div>
+        ) : (
+          <div className="space-y-3">
+            {lineTotals.map(line=> (
+              <div key={line.id} className="flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="font-medium truncate">{line.name} ×{line.qty} ({line.unit})</div>
+                  <div className="text-xs text-stone-500">Labor {currency(line.labor)} • Materials {currency(line.materials)} {line.addPct? `• Add‑on ${currency(line.addPct)}`:''}</div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input className="w-16 input" type="number" min={1} value={line.qty} onChange={e=>changeQty(line.id, Number(e.target.value))} />
+                  <div className="w-24 text-right font-semibold">{currency(line.total)}</div>
+                  <button onClick={()=>removeItem(line.id)} className="text-stone-500 hover:text-red-600">✕</button>
+                </div>
+              </div>
+            ))}
+            <div className="pt-2 border-t text-right font-semibold">Subtotal: {currency(subtotal)}</div>
+          </div>
+        )}
+      </div>
+
+      <div className="bg-white rounded-2xl shadow p-4 grid sm:grid-cols-2 gap-3">
+        <div>
+          <div className="font-bold mb-2">Materials Handling</div>
+          <label className="flex items-center gap-2 mb-1"><input type="radio" checked={materialsMode==='customer'} onChange={()=>setMaterialsMode('customer')} />Customer provides extra materials</label>
+          <label className="flex items-center gap-2"><input type="radio" checked={materialsMode==='gophers'} onChange={()=>setMaterialsMode('gophers')} />Gopher’s provides (+25% + $25 pickup)</label>
+          <div className="mt-2 flex items-center gap-2">
+            <span className="text-sm text-stone-600">Extra materials subtotal ($)</span>
+            <input className="input w-32" type="number" min={0} value={materialsExtra} onChange={e=>setMaterialsExtra(Number(e.target.value)||0)} />
+          </div>
+        </div>
+        <div>
+          <div className="font-bold mb-2">Travel</div>
+          <label className="text-sm text-stone-600">Miles beyond 15 ( $1/mi )</label>
+          <input className="input w-32" type="number" min={0} value={miles} onChange={e=>setMiles(Number(e.target.value)||0)} />
+        </div>
+      </div>
+    </section>
+
+    <aside className="space-y-4">
+      <div className="bg-white rounded-2xl shadow p-4 space-y-2">
+        <h3 className="text-xl font-bold">Your Info</h3>
+        <input className="input" placeholder="Name" value={client.name} onChange={e=>setClient({...client, name:e.target.value})} />
+        <input className="input" placeholder="Phone" value={client.phone} onChange={e=>setClient({...client, phone:e.target.value})} />
+        <input className="input" placeholder="Service Address" value={client.address} onChange={e=>setClient({...client, address:e.target.value})} />
+        <textarea className="input h-24" placeholder="Notes about your project…" value={notes} onChange={e=>setNotes(e.target.value)} />
+      </div>
+      <div className="bg-white rounded-2xl shadow p-4 space-y-1">
+        <div className="flex items-center justify-between"><span>Subtotal</span><span className="font-semibold">{currency(subtotal)}</span></div>
+        <div className="flex items-center justify-between"><span>Travel</span><span className="font-semibold">{currency(travel)}</span></div>
+        <div className="flex items-center justify-between"><span>Extra materials {(materialsMode==='gophers')? '(+25% incl.)':''}</span><span className="font-semibold">{currency(extraMaterials)}</span></div>
+        {pickup>0 && <div className="flex items-center justify-between"><span>Pickup fee</span><span className="font-semibold">{currency(pickup)}</span></div>}
+        <div className="flex items-center justify-between text-xl pt-2 border-t"><span>Total</span><span className="font-extrabold">{currency(grand)}</span></div>
+        <div className="flex gap-2 pt-2">
+          <button className="btn" onClick={copy}>Copy Quote</button>
+          <button className="btn" onClick={()=>window.print()}>Print / Save PDF</button>
+        </div>
+        <p className="text-xs text-stone-500">Final price subject to on‑site assessment. Taxes/permits extra.</p>
+      </div>
+    </aside>
+  </main>
+
+  <footer className="text-center text-sm text-stone-600 py-8">© {new Date().getFullYear()} Gopher’s Handyman Service — Alpharetta, GA</footer>
+
+  <style>{`
+    .input{ @apply w-full rounded-xl border border-stone-300 bg-white px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400; }
+    .btn{ @apply px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold shadow; }
+  `}</style>
+</div>
+
+) }
+
