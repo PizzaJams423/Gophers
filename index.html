@@ -304,7 +304,24 @@
       );
     }
 
-    try { const rootEl = document.getElementById('root'); const root = ReactDOM.createRoot(rootEl); root.render(<App/>); }
-catch (e) { const el = document.getElementById('root'); if (el) { el.style.whiteSpace = 'pre-wrap'; el.style.padding = '16px'; el.style.color = '#7f1d1d'; el.style.background = '#fef2f2'; el.innerText = 'App error: ' + (e && e.message ? e.message : String(e)); } console.error(e); }
+    try {
+  var rootEl = document.getElementById('root');
+  if (ReactDOM && ReactDOM.createRoot) {
+    var root = ReactDOM.createRoot(rootEl);
+    root.render(React.createElement(App));
+  } else {
+    ReactDOM.render(React.createElement(App), rootEl);
+  }
+} catch (e) {
+  var el = document.getElementById('root');
+  if (el) {
+    el.style.whiteSpace = 'pre-wrap';
+    el.style.padding = '16px';
+    el.style.color = '#7f1d1d';
+    el.style.background = '#fef2f2';
+    el.innerText = 'App error: ' + (e && e.message ? e.message : String(e));
+  }
+  console.error(e);
+}
   </script></body>
 </html>
