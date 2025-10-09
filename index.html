@@ -21,7 +21,7 @@
   </style>
 </head>
 <body class="text-stone-900">
-  <div id="root"></div>  <script type="text/babel" data-presets="react">
+  <div id="root">Loading…</div>  <script type="text/babel" data-presets="env,react">
     const {useState, useMemo} = React;
 
     // Swap these with your hosted mascot image URLs (PNG/SVG)
@@ -304,7 +304,7 @@
       );
     }
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App/>);
+    try { const rootEl = document.getElementById('root'); const root = ReactDOM.createRoot(rootEl); root.render(<App/>); }
+catch (e) { const el = document.getElementById('root'); if (el) { el.style.whiteSpace = 'pre-wrap'; el.style.padding = '16px'; el.style.color = '#7f1d1d'; el.style.background = '#fef2f2'; el.innerText = 'App error: ' + (e && e.message ? e.message : String(e)); } console.error(e); }
   </script></body>
 </html>
