@@ -15,6 +15,10 @@
   <style>
     html,body{background:#fff7ed} /* amber-50 */
   </style>
+  <style>
+    .fade-in{opacity:0;transition:opacity .4s ease-in}
+    .fade-in.loaded{opacity:1}
+  </style>
 </head>
 <body class="text-stone-900">
   <div id="root"></div>  <script type="text/babel">
@@ -22,12 +26,11 @@
 
     // Swap these with your hosted mascot image URLs (PNG/SVG)
     const IMG = {
-      // Upload these files to your repo at /assets/ then these URLs will work
-      logo: "/Gophers/assets/logo-gophers-handyman.png",
-      general: "/Gophers/assets/gopher-toolbox-clean.png",
-      lawn: "/Gophers/assets/gopher-weed-eater.png",
-      mechanic: "/Gophers/assets/gopher-wrench-grease.png",
-      builds: "/Gophers/assets/gopher-hammer-toolbelt.png",
+      logo: "file_00000000c3f861f9a55091d9ba0f1f3d.png",     // Main logo
+      general: "file_00000000e0d46230b0cb3139ec953033.png",  // Toolbox (General)
+      lawn: "file_00000000061c62309954b4094aabf893.png",     // Lawn & Outdoor
+      mechanic: "file_000000003f2c61f79ffc24f1fbb273a2.png", // Mechanic
+      builds: "file_0000000094f061f6a8de8b7b991300b9.png",   // Construction
     };
 
     const RATE = 40; // $/hr
@@ -155,7 +158,7 @@
       <section className=\"max-w-6xl mx-auto p-4\">
         <div className=\"bg-white rounded-2xl shadow overflow-hidden\">
           <div className=\"w-full h-64 sm:h-80 bg-amber-50 flex items-center justify-center\">
-              <img src={activeGroup.hero} alt={activeGroup.title} className=\"max-h-full w-auto object-contain\"/>
+              <img src={activeGroup.hero} alt={activeGroup.title} className="max-h-full w-auto object-contain fade-in" onLoad={(e)=>e.currentTarget.classList.add('loaded')} />
           </div>
           <div className=\"p-4 sm:p-6\">
             <h2 className=\"text-2xl font-extrabold mb-2\">{activeGroup.title}</h2>
