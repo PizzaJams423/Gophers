@@ -1,327 +1,386 @@
 <!doctype html>
-
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gopher’s Handyman Service</title>
-  <!-- Tailwind CDN (no build tools) -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- React 18 + ReactDOM + Babel for JSX in the browser -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🛠️</text></svg>">
   <style>
     html,body{background:#fff7ed} /* amber-50 */
-  </style>
-  <style>
-    .fade-in{opacity:0;transition:opacity .4s ease-in}
-    .fade-in.loaded{opacity:1}
+    .fade-in{opacity:0;transition:opacity .35s ease-in}
+    .fade-in.show{opacity:1}
   </style>
 </head>
 <body class="text-stone-900">
-  <div id="root">Loading…</div>  <script type="text/babel" data-presets="env,react">
-    const {useState, useMemo} = React;
+  <!-- Top Bar -->
+  <header class="sticky top-0 z-40 bg-amber-100/80 backdrop-blur border-b border-amber-200">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
+      <img id="logoImg" class="h-10 w-auto rounded" alt="Gopher's logo">
+      <div class="font-extrabold text-xl">Gopher’s Handyman Service</div>
+      <div class="ml-auto text-sm text-stone-600 hidden sm:block">Alpharetta + 15mi • Text/Call: (770) 000-0000</div>
+    </div>
+  </header>
 
-    // Swap these with your hosted mascot image URLs (PNG/SVG)
-    const IMG = {
-      logo: "file_00000000c3f861f9a55091d9ba0f1f3d.png",     // Main logo
-      general: "file_00000000e0d46230b0cb3139ec953033.png",  // Toolbox (General)
-      lawn: "file_00000000061c62309954b4094aabf893.png",     // Lawn & Outdoor
-      mechanic: "file_000000003f2c61f79ffc24f1fbb273a2.png", // Mechanic
-      builds: "file_0000000094f061f6a8de8b7b991300b9.png",   // Construction
-    };
+  <!-- Tabs -->
+  <nav class="max-w-6xl mx-auto px-2 pt-3 grid grid-cols-2 sm:grid-cols-5 gap-2" id="tabBar"></nav>
 
-    const RATE = 40; // $/hr
+  <!-- Section -->
+  <section class="max-w-6xl mx-auto p-4" id="sectionArea"></section>
 
-    const SERVICES = [
-      {
-        key: "general",
-        title: "General Handyman",
-        hero: IMG.general,
-        items: [
-          { id: "drywall_patch", name: "Drywall patch (small)", unit: "each", laborPerUnitHrs: 1.5, materials: 20 },
-          { id: "paint_touch", name: "Paint touch‑up (1 wall)", unit: "each", laborPerUnitHrs: 2, materials: 35 },
-          { id: "light_plumb", name: "Light plumbing (fixture)", unit: "each", laborPerUnitHrs: 2.5, materials: 15 },
-          { id: "light_elec", name: "Light electrical (fixture)", unit: "each", laborPerUnitHrs: 2.5, materials: 15 },
-          { id: "caulk", name: "Caulking / weatherstrip", unit: "opening", laborPerUnitHrs: 0.75, materials: 6 },
-        ],
-      },
-      {
-        key: "lawn",
-        title: "Lawn & Outdoor",
-        hero: IMG.lawn,
-        items: [
-          { id: "power_wash", name: "Power washing", unit: "sq ft", laborPerUnitHrs: 0.006, materials: 0.06 },
-          { id: "gutter_clean", name: "Gutter clean (1‑story)", unit: "home", laborPerUnitHrs: 3, materials: 20 },
-          { id: "holiday_lights", name: "Holiday lights install", unit: "home", laborPerUnitHrs: 5, materials: 25 },
-          { id: "weed_edge", name: "Weed‑eat & edge", unit: "visit", laborPerUnitHrs: 1.5, materials: 3 },
-        ],
-      },
-      {
-        key: "mechanic",
-        title: "Mobile Mechanic (Basic)",
-        hero: IMG.mechanic,
-        items: [
-          { id: "battery_swap", name: "Battery swap/jump", unit: "job", laborPerUnitHrs: 1, materials: 0 },
-          { id: "flat_fix", name: "Flat fix/air (where safe)", unit: "job", laborPerUnitHrs: 1, materials: 5 },
-          { id: "priority", name: "Same‑day priority (add‑on)", unit: "add‑on", laborPerUnitHrs: 0, materials: 0, percentAdd: 0.25 },
-        ],
-      },
-      {
-        key: "builds",
-        title: "Builds & Construction",
-        hero: IMG.builds,
-        items: [
-          { id: "porch", name: "Build porch", unit: "sq ft", laborPerUnitHrs: 0.4, materials: 12 },
-          { id: "patio", name: "Build patio/flooring", unit: "sq ft", laborPerUnitHrs: 0.3, materials: 10 },
-          { id: "walkway", name: "Create walkway", unit: "ft", laborPerUnitHrs: 0.8, materials: 30 },
-          { id: "fence", name: "Fence build/repair", unit: "ft", laborPerUnitHrs: 0.6, materials: 22.5 },
-          { id: "flowerbed", name: "Flowerbed build", unit: "ft", laborPerUnitHrs: 0.8, materials: 20 },
-          { id: "raised_bed", name: "Raised garden bed", unit: "each", laborPerUnitHrs: 6, materials: 150 },
-          { id: "planter_box", name: "Planter box (wood)", unit: "each", laborPerUnitHrs: 4, materials: 100 },
-        ],
-      },
-    ];
+  <!-- Main: Cart & Quote -->
+  <main class="max-w-6xl mx-auto p-4 grid lg:grid-cols-3 gap-6">
+    <section class="lg:col-span-2 space-y-4">
+      <div class="bg-white rounded-2xl shadow p-4">
+        <h3 class="text-xl font-bold mb-3">Selected Items</h3>
+        <div id="cartList" class="space-y-3 text-sm text-stone-600">No items yet. Choose a category above and tap Add.</div>
+      </div>
 
-    function currency(n){ return `$${n.toFixed(2)}` }
-
-    function App(){
-      const [active, setActive] = useState("general");
-      const [cart, setCart] = useState([]); // {id,name,unit,qty,laborHrs,materialsPerUnit,percentAdd}
-      const [materialsMode, setMaterialsMode] = useState("customer"); // customer | gophers
-      const [materialsExtra, setMaterialsExtra] = useState(0);
-      const [miles, setMiles] = useState(0);
-      const [client, setClient] = useState({name:"", phone:"", address:""});
-      const [notes, setNotes] = useState("");
-
-      const addItem = (svc)=>{
-        setCart(prev=>{
-          const f = prev.find(p=>p.id===svc.id);
-          if(f){ return prev.map(p=> p.id===svc.id? {...p, qty:p.qty+1}:p) }
-          return [...prev, { id: svc.id, name: svc.name, unit: svc.unit, qty:1, laborHrs: svc.laborPerUnitHrs, materialsPerUnit: svc.materials, percentAdd: svc.percentAdd||0 }]
-        })
-      }
-      const changeQty = (id,q)=> setCart(prev=> prev.map(p=> p.id===id? {...p, qty: Math.max(1, q||1)}:p))
-      const removeItem = (id)=> setCart(prev=> prev.filter(p=> p.id!==id))
-
-      const lineTotals = useMemo(()=> cart.map(line=>{
-        const labor = line.laborHrs * RATE * line.qty;
-        const materials = (line.materialsPerUnit * 1.25) * line.qty; // +25% markup baked in
-        const base = labor + materials;
-        const addPct = base * (line.percentAdd||0);
-        return { ...line, labor, materials, addPct, total: base + addPct };
-      }), [cart]);
-
-      const subtotal = lineTotals.reduce((s,l)=> s + l.total, 0);
-      const travel = Math.max(0, Number(miles)||0);
-      const extraMaterials = materialsExtra * (materialsMode==='gophers' ? 1.25 : 1);
-      const pickup = materialsMode==='gophers' && materialsExtra>0 ? 25 : 0;
-      const grand = subtotal + travel + extraMaterials + pickup;
-
-      const activeGroup = SERVICES.find(s=> s.key===active);
-
-      const copy = async()=>{
-        const txt = `Gopher’s Handyman Service\nQuote (Draft)\nClient: ${client.name} | ${client.phone}\nAddress: ${client.address}\n\n` +
-          lineTotals.map(l=>`• ${l.name} x${l.qty} (${l.unit}) — ${currency(l.total)}`).join('\n') +
-          `\n\nTravel: ${currency(travel)}\nExtra materials: ${currency(extraMaterials)}${pickup?` + Pickup ${currency(pickup)}`:''}\nTotal: ${currency(grand)}\n\nNotes: ${notes}`;
-        try{ await navigator.clipboard.writeText(txt); alert('Quote copied!'); }catch{ alert('Copy failed; select and copy manually.'); }
-      }
-
-      return (
+      <div class="bg-white rounded-2xl shadow p-4 grid sm:grid-cols-2 gap-4">
         <div>
-          {/* Top bar */}
-          <header className="sticky top-0 z-30 bg-amber-100/80 backdrop-blur border-b border-amber-200">
-            <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
-              <img src={IMG.logo} alt="Gopher's logo" className="h-10 w-auto rounded"/>
-              <div className="font-extrabold text-xl">Gopher’s Handyman Service</div>
-              <div className="ml-auto text-sm text-stone-600 hidden sm:block">Alpharetta + 15mi • Text/Call: (770) 000‑0000</div>
-            </div>
-          </header>
-
-          {/* Tabs */}
-          <nav className=\"max-w-6xl mx-auto px-2 pt-3 grid grid-cols-2 sm:grid-cols-5 gap-2\">
-        {SERVICES.map(s=> (
-          <button key={s.key} onClick={()=>setActive(s.key)} className={`rounded-2xl px-3 py-2 font-semibold shadow ${active===s.key? 'bg-amber-500 text-white':'bg-white hover:bg-amber-100'}`}>
-            {s.title}
-          </button>
-        ))}
-        <button key=\"membership\" onClick={()=>setActive('membership')} className={`rounded-2xl px-3 py-2 font-semibold shadow ${active==='membership'? 'bg-amber-500 text-white':'bg-white hover:bg-amber-100'}`}>
-          Membership Plans
-        </button>
-      </nav>
-
-          {/* Section with Hero image */}
-          {/* Dynamic Section (Services OR Membership) */}
-      {active !== 'membership' ? (
-      <section className=\"max-w-6xl mx-auto p-4\">
-        <div className=\"bg-white rounded-2xl shadow overflow-hidden\">
-          <div className=\"w-full h-64 sm:h-80 bg-amber-50 flex items-center justify-center\">
-              <img src={activeGroup.hero} alt={activeGroup.title} className="max-h-full w-auto object-contain fade-in" onLoad={(e)=>e.currentTarget.classList.add('loaded')} />
-          </div>
-          <div className=\"p-4 sm:p-6\">
-            <h2 className=\"text-2xl font-extrabold mb-2\">{activeGroup.title}</h2>
-            <p className=\"text-stone-600 mb-4\">Add services below to build your appointment and instant estimate. If Gopher’s supplies materials, a 25% handling and $25 pickup apply.</p>
-            <div className=\"divide-y\">
-              {activeGroup.items.map(item=> (
-                <div key={item.id} className=\"flex items-center justify-between py-3 gap-3\">
-                  <div>
-                    <div className=\"font-semibold\">{item.name}</div>
-                    <div className=\"text-xs text-stone-500\">Unit: {item.unit} • Labor {item.laborPerUnitHrs}h/{item.unit} @ ${RATE}/hr • Materials est. ${item.materials} (+25% incl.)</div>
-                  </div>
-                  <button onClick={()=>addItem(item)} className=\"px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold shadow\">Add</button>
-                </div>
-              ))}
-            </div>
+          <div class="font-bold mb-2">Materials Handling</div>
+          <label class="flex items-center gap-2 mb-1">
+            <input type="radio" name="matMode" value="customer" checked>Customer provides extra materials
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="radio" name="matMode" value="gophers">Gopher’s provides (+25% + $25 pickup)
+          </label>
+          <div class="mt-2 flex items-center gap-2">
+            <span class="text-sm text-stone-600">Extra materials subtotal ($)</span>
+            <input id="extraMaterials" class="rounded-xl border border-stone-300 px-2 py-1 w-32" type="number" min="0" value="0">
           </div>
         </div>
-      </section>
-      ) : (
-      <section className=\"max-w-6xl mx-auto p-4\">
-        <div className=\"bg-white rounded-2xl shadow p-4 sm:p-6\">
-          <h2 className=\"text-2xl font-extrabold mb-2\">Membership Plans</h2>
-          <p className=\"text-stone-600 mb-4\">Lock in priority help across handyman, lawn, seasonal décor, and light auto services. Materials billed separately (
-            <span className=\"font-medium\">+25% handling</span> when Gopher’s supplies). Cancel anytime.</p>
-          <div className=\"grid md:grid-cols-3 gap-4\">
-            {/* Basic */}
-            <div className=\"rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow\">
-              <div className=\"text-xl font-bold\">Gopher Basic</div>
-              <div className=\"text-2xl font-extrabold\">$99<span className=\"text-base font-medium\">/mo</span></div>
-              <ul className=\"text-sm mt-2 space-y-1\">
-                <li>• Up to <b>3 hours</b> monthly</li>
-                <li>• <b>Priority 48‑hr</b> scheduling</li>
-                <li>• <b>10% off</b> extra hours ($36/hr)</li>
-                <li>• Free local travel (15mi)</li>
-                <li>• Hours roll over 2 months</li>
-              </ul>
-              <a href=\"sms:+17700000000?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20to%20join%20Gopher%20Basic.%20\" className=\"mt-3 inline-block px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold shadow\">Join Basic</a>
-            </div>
-            {/* Plus */}
-            <div className=\"rounded-2xl border border-amber-200 bg-white p-4 shadow\">
-              <div className=\"text-xl font-bold\">Gopher Plus</div>
-              <div className=\"text-2xl font-extrabold\">$199<span className=\"text-base font-medium\">/mo</span></div>
-              <ul className=\"text-sm mt-2 space-y-1\">
-                <li>• Up to <b>6 hours</b> monthly</li>
-                <li>• <b>15% off</b> extra hours ($34/hr)</li>
-                <li>• Same‑week priority</li>
-                <li>• 1 quarterly free haul/power wash</li>
-                <li>• Hours roll over 3 months</li>
-              </ul>
-              <a href=\"sms:+17700000000?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20to%20join%20Gopher%20Plus.%20\" className=\"mt-3 inline-block px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold shadow\">Join Plus</a>
-            </div>
-            {/* Gold */}
-            <div className=\"rounded-2xl border border-amber-200 bg-white p-4 shadow\">
-              <div className=\"text-xl font-bold\">Gopher Gold</div>
-              <div className=\"text-2xl font-extrabold\">$349<span className=\"text-base font-medium\">/mo</span></div>
-              <ul className=\"text-sm mt-2 space-y-1\">
-                <li>• Up to <b>10 hours</b> monthly</li>
-                <li>• <b>20% off</b> extra hours ($32/hr)</li>
-                <li>• Same‑week guaranteed slot</li>
-                <li>• 1 free emergency or mobile mechanic service / mo</li>
-                <li>• Free travel up to 25mi</li>
-              </ul>
-              <a href=\"sms:+17700000000?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20to%20join%20Gopher%20Gold.%20\" className=\"mt-3 inline-block px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold shadow\">Join Gold</a>
-            </div>
-          </div>
-          <p className=\"text-xs text-stone-500 mt-4\">You can pause or cancel any time. Materials billed separately. Membership hours cover labor for handyman, lawn, seasonal décor, and light auto services.</p>
+        <div>
+          <div class="font-bold mb-2">Travel</div>
+          <label class="text-sm text-stone-600">Miles beyond 15 ($1/mi)</label>
+          <input id="milesBeyond" class="rounded-xl border border-stone-300 px-2 py-1 w-32" type="number" min="0" value="0">
         </div>
-      </section>
-      )}
+      </div>
+    </section>
 
-          <main className="max-w-6xl mx-auto p-4 grid lg:grid-cols-3 gap-6">
-            {/* Cart */}
-            <section className="lg:col-span-2 space-y-4">
-              <div className="bg-white rounded-2xl shadow p-4">
-                <h3 className="text-xl font-bold mb-3">Selected Items</h3>
-                {lineTotals.length===0 ? (
-                  <div className="text-sm text-stone-500">No items yet. Choose a category above and tap Add.</div>
-                ) : (
-                  <div className="space-y-3">
-                    {lineTotals.map(line=> (
-                      <div key={line.id} className="flex items-center justify-between gap-2">
-                        <div className="min-w-0">
-                          <div className="font-medium truncate">{line.name} ×{line.qty} ({line.unit})</div>
-                          <div className="text-xs text-stone-500">Labor {currency(line.labor)} • Materials {currency(line.materials)} {line.addPct? `• Add‑on ${currency(line.addPct)}`:''}</div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <input className="w-16 rounded-xl border border-stone-300 px-2 py-1" type="number" min="1" value={line.qty} onChange={e=>changeQty(line.id, Number(e.target.value))} />
-                          <div className="w-24 text-right font-semibold">{currency(line.total)}</div>
-                          <button onClick={()=>removeItem(line.id)} className="text-stone-500 hover:text-red-600">✕</button>
-                        </div>
-                      </div>
-                    ))}
-                    <div className="pt-2 border-t text-right font-semibold">Subtotal: {currency(subtotal)}</div>
-                  </div>
-                )}
-              </div>
-
-              <div className="bg-white rounded-2xl shadow p-4 grid sm:grid-cols-2 gap-4">
-                <div>
-                  <div className="font-bold mb-2">Materials Handling</div>
-                  <label className="flex items-center gap-2 mb-1"><input type="radio" checked={materialsMode==='customer'} onChange={()=>setMaterialsMode('customer')} />Customer provides extra materials</label>
-                  <label className="flex items-center gap-2"><input type="radio" checked={materialsMode==='gophers'} onChange={()=>setMaterialsMode('gophers')} />Gopher’s provides (+25% + $25 pickup)</label>
-                  <div className="mt-2 flex items-center gap-2">
-                    <span className="text-sm text-stone-600">Extra materials subtotal ($)</span>
-                    <input className="rounded-xl border border-stone-300 px-2 py-1 w-32" type="number" min="0" value={materialsExtra} onChange={e=>setMaterialsExtra(Number(e.target.value)||0)} />
-                  </div>
-                </div>
-                <div>
-                  <div className="font-bold mb-2">Travel</div>
-                  <label className="text-sm text-stone-600">Miles beyond 15 ($1/mi)</label>
-                  <input className="rounded-xl border border-stone-300 px-2 py-1 w-32" type="number" min="0" value={miles} onChange={e=>setMiles(Number(e.target.value)||0)} />
-                </div>
-              </div>
-            </section>
-
-            {/* Sidebar */}
-            <aside className="space-y-4">
-              <div className="bg-white rounded-2xl shadow p-4 space-y-2">
-                <h3 className="text-xl font-bold">Your Info</h3>
-                <input className="rounded-xl border border-stone-300 px-3 py-2 w-full" placeholder="Name" value={client.name} onChange={e=>setClient({...client, name:e.target.value})} />
-                <input className="rounded-xl border border-stone-300 px-3 py-2 w-full" placeholder="Phone" value={client.phone} onChange={e=>setClient({...client, phone:e.target.value})} />
-                <input className="rounded-xl border border-stone-300 px-3 py-2 w-full" placeholder="Service Address" value={client.address} onChange={e=>setClient({...client, address:e.target.value})} />
-                <textarea className="rounded-xl border border-stone-300 px-3 py-2 w-full h-24" placeholder="Notes about your project…" value={notes} onChange={e=>setNotes(e.target.value)} />
-              </div>
-              <div className="bg-white rounded-2xl shadow p-4 space-y-1">
-                <div className="flex items-center justify-between"><span>Subtotal</span><span className="font-semibold">{currency(subtotal)}</span></div>
-                <div className="flex items-center justify-between"><span>Travel</span><span className="font-semibold">{currency(travel)}</span></div>
-                <div className="flex items-center justify-between"><span>Extra materials {(materialsMode==='gophers')? '(+25% incl.)':''}</span><span className="font-semibold">{currency(extraMaterials)}</span></div>
-                {pickup>0 && <div className="flex items-center justify-between"><span>Pickup fee</span><span className="font-semibold">{currency(pickup)}</span></div>}
-                <div className="flex items-center justify-between text-xl pt-2 border-t"><span>Total</span><span className="font-extrabold">{currency(grand)}</span></div>
-                <div className=\"flex gap-2 pt-2\">
-                  <button className=\"px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold shadow\" onClick={copy}>Copy Quote</button>
-                  <button className=\"px-3 py-2 rounded-xl bg-stone-800 hover:bg-stone-900 text-white font-semibold shadow\" onClick={()=>window.print()}>Print / Save PDF</button>
-                  <a href=\"sms:+17700000000?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate.%20\" className=\"px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow\">Text Gopher</a>
-                </div>
-                <p className=\"text-xs text-stone-500\">Final price subject to on‑site assessment. Taxes/permits extra.</p>
-              </div>
-            </aside>
-          </main>
-
-          <footer className="text-center text-sm text-stone-600 py-8">© {new Date().getFullYear()} Gopher’s Handyman Service — Alpharetta, GA</footer>
+    <aside class="space-y-4">
+      <div class="bg-white rounded-2xl shadow p-4 space-y-2">
+        <h3 class="text-xl font-bold">Your Info</h3>
+        <input id="clientName" class="rounded-xl border border-stone-300 px-3 py-2 w-full" placeholder="Name">
+        <input id="clientPhone" class="rounded-xl border border-stone-300 px-3 py-2 w-full" placeholder="Phone">
+        <input id="clientAddr" class="rounded-xl border border-stone-300 px-3 py-2 w-full" placeholder="Service Address">
+        <textarea id="clientNotes" class="rounded-xl border border-stone-300 px-3 py-2 w-full h-24" placeholder="Notes about your project…"></textarea>
+      </div>
+      <div class="bg-white rounded-2xl shadow p-4 space-y-1">
+        <div class="flex items-center justify-between"><span>Subtotal</span><span id="sumSubtotal" class="font-semibold">$0.00</span></div>
+        <div class="flex items-center justify-between"><span>Travel</span><span id="sumTravel" class="font-semibold">$0.00</span></div>
+        <div class="flex items-center justify-between"><span>Extra materials <span id="matNote"></span></span><span id="sumExtraMat" class="font-semibold">$0.00</span></div>
+        <div id="pickupRow" class="hidden flex items-center justify-between"><span>Pickup fee</span><span id="sumPickup" class="font-semibold">$0.00</span></div>
+        <div class="flex items-center justify-between text-xl pt-2 border-t"><span>Total</span><span id="sumGrand" class="font-extrabold">$0.00</span></div>
+        <div class="flex gap-2 pt-2">
+          <button id="copyQuote" class="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold shadow">Copy Quote</button>
+          <button onclick="window.print()" class="px-3 py-2 rounded-xl bg-stone-800 hover:bg-stone-900 text-white font-semibold shadow">Print / Save PDF</button>
+          <a id="smsLink" href="sms:+17700000000?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate." class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow">Text Gopher</a>
         </div>
-      );
+        <p class="text-xs text-stone-500">Final price subject to on-site assessment. Taxes/permits extra.</p>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="text-center text-sm text-stone-600 py-8">© <span id="yr"></span> Gopher’s Handyman Service — Alpharetta, GA</footer>
+
+  <script>
+  // ---------- CONFIG ----------
+  const RATE = 40; // $/hr
+  const IMG = {
+    logo: "file_00000000c3f861f9a55091d9ba0f1f3d.png",     // Main logo
+    general: "file_00000000e0d46230b0cb3139ec953033.png",  // Toolbox (General)
+    lawn: "file_00000000061c62309954b4094aabf893.png",     // Lawn & Outdoor
+    mechanic: "file_000000003f2c61f79ffc24f1fbb273a2.png", // Mechanic
+    builds: "file_0000000094f061f6a8de8b7b991300b9.png",   // Construction
+  };
+
+  const CATALOG = [
+    {
+      key: "general",
+      title: "General Handyman",
+      hero: IMG.general,
+      items: [
+        { id:"drywall_patch", name:"Drywall patch (small)", unit:"each", laborHrs:1.5, materials:20 },
+        { id:"paint_touch", name:"Paint touch-up (1 wall)", unit:"each", laborHrs:2, materials:35 },
+        { id:"light_plumb", name:"Light plumbing (fixture)", unit:"each", laborHrs:2.5, materials:15 },
+        { id:"light_elec",  name:"Light electrical (fixture)", unit:"each", laborHrs:2.5, materials:15 },
+        { id:"caulk",       name:"Caulking / weatherstrip", unit:"opening", laborHrs:0.75, materials:6 },
+      ],
+    },
+    {
+      key: "lawn",
+      title: "Lawn & Outdoor",
+      hero: IMG.lawn,
+      items: [
+        { id:"power_wash", name:"Power washing", unit:"sq ft", laborHrs:0.006, materials:0.06 },
+        { id:"gutter_clean", name:"Gutter clean (1-story)", unit:"home", laborHrs:3, materials:20 },
+        { id:"holiday_lights", name:"Holiday lights install", unit:"home", laborHrs:5, materials:25 },
+        { id:"weed_edge", name:"Weed-eat & edge", unit:"visit", laborHrs:1.5, materials:3 },
+      ],
+    },
+    {
+      key: "mechanic",
+      title: "Mobile Mechanic (Basic to Light Service)",
+      hero: IMG.mechanic,
+      items: [
+        { id:"battery_swap", name:"Battery swap/jump", unit:"job", laborHrs:1, materials:0 },
+        { id:"flat_fix", name:"Flat repair/air (where safe)", unit:"job", laborHrs:1, materials:5 },
+        { id:"brakes", name:"Brake job (pads/rotors)", unit:"axle", laborHrs:2.5, materials:90 },
+        { id:"oil_change", name:"Oil change (incl. filter)", unit:"job", laborHrs:0.7, materials:35 },
+        { id:"plugs", name:"Spark plug replacement", unit:"set", laborHrs:1.2, materials:20 },
+        { id:"tuneup", name:"Tune-up (filters/plugs/fluids)", unit:"job", laborHrs:2.2, materials:45 },
+        { id:"stereo", name:"Stereo/radio install", unit:"job", laborHrs:1.5, materials:10 },
+        { id:"sub", name:"Subwoofer install & wiring", unit:"job", laborHrs:2, materials:25 },
+      ],
+    },
+    {
+      key: "builds",
+      title: "Builds & Construction",
+      hero: IMG.builds,
+      items: [
+        { id:"porch", name:"Build porch", unit:"sq ft", laborHrs:0.4, materials:12 },
+        { id:"patio", name:"Build patio/flooring", unit:"sq ft", laborHrs:0.3, materials:10 },
+        { id:"walkway", name:"Create walkway", unit:"ft", laborHrs:0.8, materials:30 },
+        { id:"fence", name:"Fence build/repair", unit:"ft", laborHrs:0.6, materials:22.5 },
+        { id:"flowerbed", name:"Flowerbed build", unit:"ft", laborHrs:0.8, materials:20 },
+        { id:"raised_bed", name:"Raised garden bed", unit:"each", laborHrs:6, materials:150 },
+        { id:"planter_box", name:"Planter box (wood)", unit:"each", laborHrs:4, materials:100 },
+        { id:"bath_remodel", name:"Tile & bathroom remodels", unit:"job", laborHrs:25, materials:800 },
+      ],
+    },
+  ];
+
+  const MEMBERSHIP = [
+    { name:"Gopher Basic", price:99, perks:[
+      "Up to 3 hours monthly",
+      "Priority 48-hr scheduling",
+      "10% off extra hours ($36/hr)",
+      "Free local travel (15mi)",
+      "Hours roll over 2 months"
+    ]},
+    { name:"Gopher Plus", price:199, perks:[
+      "Up to 6 hours monthly",
+      "15% off extra hours ($34/hr)",
+      "Same-week priority",
+      "1 quarterly free haul/power wash",
+      "Hours roll over 3 months"
+    ]},
+    { name:"Gopher Gold", price:349, perks:[
+      "Up to 10 hours monthly",
+      "20% off extra hours ($32/hr)",
+      "Same-week guaranteed slot",
+      "1 free emergency or mobile mechanic service / mo",
+      "Free travel up to 25mi"
+    ]},
+  ];
+
+  // ---------- STATE ----------
+  let activeTab = "general";
+  const cart = []; // {id,name,unit,qty,laborHrs,materials}
+  let materialsMode = "customer";
+  let extraMaterials = 0;
+  let milesBeyond = 0;
+
+  // ---------- HELPERS ----------
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => document.querySelectorAll(sel);
+  const currency = n => `$${(Math.round(n*100)/100).toFixed(2)}`;
+
+  function calcLineTotal(line){
+    const labor = line.laborHrs * RATE * line.qty;
+    const materials = (line.materials * 1.25) * line.qty; // +25% per-unit baked in
+    return { labor, materials, total: labor + materials };
+  }
+
+  function renderTabs(){
+    const tabs = [...CATALOG.map(c=>({key:c.key, label:c.title})), {key:"membership", label:"Membership Plans"}];
+    $('#tabBar').innerHTML = tabs.map(t => `
+      <button data-tab="${t.key}"
+        class="rounded-2xl px-3 py-2 font-semibold shadow ${activeTab===t.key?'bg-amber-500 text-white':'bg-white hover:bg-amber-100'}">
+        ${t.label}
+      </button>
+    `).join('');
+    $$('#tabBar button').forEach(btn=>{
+      btn.onclick = () => { activeTab = btn.dataset.tab; renderSection(); };
+    });
+  }
+
+  function renderHero(imgUrl, title){
+    return `
+      <div class="bg-white rounded-2xl shadow overflow-hidden">
+        <div class="w-full h-64 sm:h-80 bg-amber-50 flex items-center justify-center">
+          <img src="${imgUrl}" alt="${title}" class="max-h-full w-auto object-contain fade-in" onload="this.classList.add('show')">
+        </div>
+        <div class="p-4 sm:p-6">
+          <h2 class="text-2xl font-extrabold mb-2">${title}</h2>
+          <p class="text-stone-600 mb-4">Add services below to build your appointment and instant estimate. If Gopher’s supplies materials, a 25% handling and $25 pickup apply.</p>
+          <div class="divide-y" id="catalogList"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderMembership(){
+    const cards = MEMBERSHIP.map((p,i)=>`
+      <div class="rounded-2xl border border-amber-200 ${i===0?'bg-amber-50':'bg-white'} p-4 shadow">
+        <div class="text-xl font-bold">${p.name}</div>
+        <div class="text-2xl font-extrabold">$${p.price}<span class="text-base font-medium">/mo</span></div>
+        <ul class="text-sm mt-2 space-y-1">
+          ${p.perks.map(x=>`<li>• ${x}</li>`).join('')}
+        </ul>
+        <a href="sms:+17700000000?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20to%20join%20${encodeURIComponent(p.name)}.%20"
+           class="mt-3 inline-block px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold shadow">
+           Join ${p.name.split(' ')[1]}
+        </a>
+      </div>
+    `).join('');
+    return `
+      <div class="bg-white rounded-2xl shadow p-4 sm:p-6">
+        <h2 class="text-2xl font-extrabold mb-2">Membership Plans</h2>
+        <p class="text-stone-600 mb-4">Lock in priority help across handyman, lawn, seasonal décor, and light auto services. Materials billed separately (<span class="font-medium">+25% handling</span> when Gopher’s supplies). Cancel anytime.</p>
+        <div class="grid md:grid-cols-3 gap-4">${cards}</div>
+        <p class="text-xs text-stone-500 mt-4">You can pause or cancel any time. Membership hours cover labor for handyman, lawn, seasonal décor, and light auto services.</p>
+      </div>`;
+  }
+
+  function renderSection(){
+    const area = $('#sectionArea');
+    if(activeTab === "membership"){
+      area.innerHTML = renderMembership();
+      return;
     }
+    const cat = CATALOG.find(c=>c.key===activeTab);
+    area.innerHTML = renderHero(cat.hero, cat.title);
+    const list = $('#catalogList');
+    list.innerHTML = cat.items.map(it => `
+      <div class="flex items-center justify-between py-3 gap-3">
+        <div>
+          <div class="font-semibold">${it.name}</div>
+          <div class="text-xs text-stone-500">Unit: ${it.unit} • Labor ${it.laborHrs}h/${it.unit} @ $${RATE}/hr • Materials est. $${it.materials} (+25% incl.)</div>
+        </div>
+        <button class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold shadow"
+          data-add="${it.id}">Add</button>
+      </div>
+    `).join('');
+    list.querySelectorAll('[data-add]').forEach(btn=>{
+      btn.onclick = () => {
+        const id = btn.dataset.add;
+        const svc = cat.items.find(x=>x.id===id);
+        const found = cart.find(x=>x.id===id);
+        if(found){ found.qty += 1; }
+        else { cart.push({ id:svc.id, name:svc.name, unit:svc.unit, qty:1, laborHrs:svc.laborHrs, materials:svc.materials }); }
+        renderCartTotals();
+      };
+    });
+  }
 
+  function renderCartTotals(){
+    const container = $('#cartList');
+    if(cart.length===0){
+      container.innerHTML = 'No items yet. Choose a category above and tap Add.';
+    } else {
+      container.innerHTML = cart.map(line=>{
+        const costs = calcLineTotal(line);
+        return `
+          <div class="flex items-center justify-between gap-2">
+            <div class="min-w-0">
+              <div class="font-medium truncate">${line.name} ×${line.qty} (${line.unit})</div>
+              <div class="text-xs text-stone-500">Labor ${currency(costs.labor)} • Materials ${currency(costs.materials)}</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="number" min="1" value="${line.qty}" data-qty="${line.id}" class="w-16 rounded-xl border border-stone-300 px-2 py-1">
+              <div class="w-24 text-right font-semibold">${currency(costs.total)}</div>
+              <button data-del="${line.id}" class="text-stone-500 hover:text-red-600">✕</button>
+            </div>
+          </div>
+        `;
+      }).join('') + `<div class="pt-2 border-t text-right font-semibold">Subtotal: <span id="subtotalSpan"></span></div>`;
+      // bind qty/del
+      container.querySelectorAll('[data-qty]').forEach(inp=>{
+        inp.oninput = () => {
+          const id = inp.dataset.qty;
+          const row = cart.find(x=>x.id===id);
+          row.qty = Math.max(1, Number(inp.value)||1);
+          renderCartTotals();
+        };
+      });
+      container.querySelectorAll('[data-del]').forEach(btn=>{
+        btn.onclick = () => {
+          const id = btn.dataset.del;
+          const idx = cart.findIndex(x=>x.id===id);
+          if(idx>=0){ cart.splice(idx,1); }
+          renderCartTotals();
+        };
+      });
+    }
+    // totals
+    const subtotal = cart.reduce((s,l)=> s + calcLineTotal(l).total, 0);
+    const travel = Math.max(0, Number(milesBeyond)||0);
+    const extra = materialsMode === 'gophers' ? extraMaterials * 1.25 : extraMaterials;
+    const pickup = (materialsMode === 'gophers' && extraMaterials>0) ? 25 : 0;
+    const grand = subtotal + travel + extra + pickup;
+
+    const $id = x=>document.getElementById(x);
+    $id('subtotalSpan') && ($id('subtotalSpan').innerText = currency(subtotal));
+    $id('sumSubtotal').innerText = currency(subtotal);
+    $id('sumTravel').innerText = currency(travel);
+    $id('sumExtraMat').innerText = currency(extra);
+    $id('sumPickup').innerText = currency(pickup);
+    document.getElementById('pickupRow').className = pickup>0 ? "flex items-center justify-between" : "hidden flex items-center justify-between";
+    document.getElementById('matNote').innerText = materialsMode==='gophers' ? '(+25% incl.)' : '';
+    document.getElementById('sumGrand').innerText = currency(grand);
+  }
+
+  // ---------- EVENTS ----------
+  // material mode
+  document.querySelectorAll('input[name="matMode"]').forEach(r=>{
+    r.onchange = ()=>{ materialsMode = r.value; renderCartTotals(); };
+  });
+  document.getElementById('extraMaterials').oninput = e => { extraMaterials = Number(e.target.value)||0; renderCartTotals(); };
+  document.getElementById('milesBeyond').oninput = e => { milesBeyond = Number(e.target.value)||0; renderCartTotals(); };
+
+  // copy quote
+  document.getElementById('copyQuote').onclick = async () => {
+    const items = cart.map(l=>{
+      const t = calcLineTotal(l).total;
+      return `• ${l.name} x${l.qty} (${l.unit}) — ${currency(t)}`;
+    }).join("\n") || "(none yet)";
+    const travel = Math.max(0, Number(milesBeyond)||0);
+    const extra = materialsMode === 'gophers' ? extraMaterials * 1.25 : extraMaterials;
+    const pickup = (materialsMode === 'gophers' && extraMaterials>0) ? 25 : 0;
+    const subtotal = cart.reduce((s,l)=> s + calcLineTotal(l).total, 0);
+    const grand = subtotal + travel + extra + pickup;
+
+    const text =
+`Gopher’s Handyman Service
+Quote (Draft)
+
+Client: ${document.getElementById('clientName').value} | ${document.getElementById('clientPhone').value}
+Address: ${document.getElementById('clientAddr').value}
+
+Items:
+${items}
+
+Travel (>$15mi): ${currency(travel)}
+Extra materials ${materialsMode==='gophers'?'(incl. +25%)':''}: ${currency(extra)}${pickup?` + Pickup ${currency(pickup)}`:''}
+
+Total: ${currency(grand)}
+
+Notes: ${document.getElementById('clientNotes').value}`;
     try {
-  var rootEl = document.getElementById('root');
-  if (ReactDOM && ReactDOM.createRoot) {
-    var root = ReactDOM.createRoot(rootEl);
-    root.render(React.createElement(App));
-  } else {
-    ReactDOM.render(React.createElement(App), rootEl);
-  }
-} catch (e) {
-  var el = document.getElementById('root');
-  if (el) {
-    el.style.whiteSpace = 'pre-wrap';
-    el.style.padding = '16px';
-    el.style.color = '#7f1d1d';
-    el.style.background = '#fef2f2';
-    el.innerText = 'App error: ' + (e && e.message ? e.message : String(e));
-  }
-  console.error(e);
-}
-  </script></body>
+      await navigator.clipboard.writeText(text);
+      alert('Quote copied!');
+    } catch {
+      alert('Copy failed. Select and copy manually.');
+    }
+  };
+
+  // ---------- INIT ----------
+  document.getElementById('logoImg').src = IMG.logo;
+  document.getElementById('yr').innerText = new Date().getFullYear();
+  renderTabs();
+  renderSection();
+  renderCartTotals();
+  </script>
+</body>
 </html>
