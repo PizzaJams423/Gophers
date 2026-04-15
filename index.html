@@ -169,21 +169,28 @@
 
       // Special layout for Project Gallery
       if (active === 'oldproj') {
-          // Default layout for all other tabs
-sec.innerHTML = `
-  <div class="card overflow-hidden">
-    <div class="w-full h-64 sm:h-80 bg-amber-50 flex items-center justify-center">
-      <img src="${group.hero}" alt="${group.title}" class="max-h-full w-auto object-contain fade-in" onload="this.classList.add('show')">
-    </div>
-    <div class="p-4 sm:p-6">
-      <h2 class="text-2xl font-extrabold mb-2">${group.title}</h2>
-      <ul class="list-disc pl-5 space-y-1">
-        ${group.list.map(item=>`<li>${item}</li>`).join('')}
-      </ul>
-    </div>
-  </div>
-`;
-        
+        sec.innerHTML = `
+          <div class="w-full h-64 sm:h-80 bg-amber-50 flex items-center justify-center">
+            <img src="${group.hero}" alt="${group.title}" class="max-h-full w-auto object-contain fade-in" onload="this.classList.add('show')">
+          </div>
+          <div class="flex flex-col space-y-6">
+            <div class="card p-6">
+            <div class="bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-t-lg mb-4">
+          Paint Countertops and LVP
+        </div>
+              <div class="grid grid-cols-2 gap-4 mb-4 text-center">
+                <div class="font-bold text-stone-700">Before</div>
+                <div class="font-bold text-stone-700">After</div>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <img src="file_00000000before.jpg" alt="Before: description of the job" class="w-full h-auto rounded-lg object-cover">
+                <img src="Clark-lvp.webp"  alt="After: description of the job"  class="w-full h-auto rounded-lg object-cover">
+                <img src="file_00000000before.jpg" alt="Before: description of the job" class="w-full h-auto rounded-lg object-cover">
+                <img src="Clark_kit.webp"  alt="After: description of the job"  class="w-full h-auto rounded-lg object-cover">
+              </div>
+            </div>
+          </div>
+        `;
         return;
       }
 
@@ -196,7 +203,7 @@ sec.innerHTML = `
           <div class="p-4 sm:p-6">
             <h2 class="text-2xl font-extrabold mb-2">${group.title}</h2>
             <ul class="list-disc pl-5 space-y-1">
-              ${group.list.map(item=`<li>${item}</li>`).join('')}
+              ${group.list.map(item=>`>${item}</li>`).join('')}
             </ul>
           </div>
         </div>
@@ -211,3 +218,7 @@ sec.innerHTML = `
   </script>
 </body>
 </html>
+
+
+
+why are none of the other sections loading as lists now
