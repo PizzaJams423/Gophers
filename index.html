@@ -57,7 +57,7 @@
   <section class="max-w-6xl mx-auto px-4 py-4">
     <div class="card p-4">
       <div class="w-full flex items-center justify-center mb-3">
-        <img src="file_0000000033c061f58a296450d1d6f625.png" alt="Call or text Gopher’s now!" class="max-h-40 sm:max-h-48 w-auto fade-in" onload="this.classList.add('show')">
+        <img src="file_0000000033c061f58a296450d1d6f625.png" alt="Virtual Estimates Coming Soon!" class="max-h-40 sm:max-h-48 w-auto fade-in" onload="this.classList.add('show')">
       </div>
       <div class="flex flex-wrap gap-2 justify-end">
         <a id="smsLink" href="sms:+14238882856?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate." class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow">Text Gopher</a>
@@ -187,7 +187,9 @@
                 <img src="Clark-lvp.webp"  alt="After: description of the job"  class="w-full h-auto rounded-lg object-cover">
                 <img src="file_00000000before.jpg" alt="Before: description of the job" class="w-full h-auto rounded-lg object-cover">
                 <img src="Clark_kit.webp"  alt="After: description of the job"  class="w-full h-auto rounded-lg object-cover">
-              </div>
+              </div><ul class="list-disc pl-5 space-y-1">
+              ${group.list.map(item=>`<li>${item}</li>`).join('')}
+            </ul>
             </div>
           </div>
         `;
