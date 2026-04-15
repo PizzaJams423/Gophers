@@ -203,7 +203,7 @@
           <div class="p-4 sm:p-6">
             <h2 class="text-2xl font-extrabold mb-2">${group.title}</h2>
             <ul class="list-disc pl-5 space-y-1">
-              ${group.list.map(item=>`>${item}</li>`).join('')}
+              ${group.list.map(item=>`<li>${item}</li>`).join('')}
             </ul>
           </div>
         </div>
