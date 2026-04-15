@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -17,27 +16,28 @@
     .card{background:#fff;border-radius:1rem;box-shadow:0 1px 4px rgba(0,0,0,.08)}
   </style>
 </head>
-  <!-- Sticky mobile CTA -->
-<div class="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-white/95 backdrop-blur border-t border-stone-200 shadow-[0_-2px_10px_rgba(0,0,0,0.08)]">
-  <div class="grid grid-cols-2 gap-2 p-3">
-    <a
-      href="tel:+14238882856"
-      class="flex items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-white font-semibold shadow active:scale-[0.99]"
-      aria-label="Call Gopher at 423-888-2856"
-    >
-      Call
-    </a>
-
-    <a
-      href="sms:+14238882856?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate."
-      class="flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-white font-semibold shadow active:scale-[0.99]"
-      aria-label="Text Gopher for an estimate"
-    >
-      Text
-    </a>
-  </div>
-</div>
 <body class="text-stone-900">
+  <!-- Sticky mobile CTA -->
+  <div class="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-white/95 backdrop-blur border-t border-stone-200 shadow-[0_-2px_10px_rgba(0,0,0,0.08)]">
+    <div class="grid grid-cols-2 gap-2 p-3">
+      <a
+        href="tel:+14238882856"
+        class="flex items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-white font-semibold shadow active:scale-[0.99]"
+        aria-label="Call Gopher at 423-888-2856"
+      >
+        Call
+      </a>
+
+      <a
+        href="sms:+14238882856?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate."
+        class="flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-white font-semibold shadow active:scale-[0.99]"
+        aria-label="Text Gopher for an estimate"
+      >
+        Text
+      </a>
+    </div>
+  </div>
+
   <!-- Header -->
   <header class="sticky top-0 z-40 bg-amber-100/80 backdrop-blur border-b border-amber-200">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
@@ -51,7 +51,7 @@
   <nav id="tabBar" class="max-w-6xl mx-auto px-2 pt-3 grid grid-cols-2 sm:grid-cols-5 gap-2"></nav>
 
   <!-- Section area (render target for JS) -->
-  <main id="sectionArea" class="max-w-6xl mx-auto px-4 py-6"></main>
+  <main id="sectionArea" class="max-w-6xl mx-auto px-4 py-6 pb-24 sm:pb-6"></main>
 
   <!-- Contact / CTA card -->
   <section class="max-w-6xl mx-auto px-4 py-4">
@@ -69,141 +69,144 @@
   <footer class="text-center text-sm text-stone-600 py-8">© <span id="yr"></span> Gopher’s Handyman Service — Chattanooga, TN</footer>
 
   <script>
-  // ----- CONFIG -----
-  const IMG = {
-    logo: "file_00000000c3f861f9a55091d9ba0f1f3d.png",     // Main logo
-    general: "file_00000000e0d46230b0cb3139ec953033.png",  // Toolbox (General)
-    lawn: "file_00000000061c62309954b4094aabf893.png",     // Lawn & Outdoor
-    mechanic: "file_000000003f2c61f79ffc24f1fbb273a2.png", // Mechanic
-    builds: "file_00000000fd506230a50b8dc7dfefb9da.png",   // Construction
-    joblog: "Goodgoph.png"                                 // Past Jobs
-  };
+    // ----- CONFIG -----
+    const IMG = {
+      logo: "file_00000000c3f861f9a55091d9ba0f1f3d.png",     // Main logo
+      general: "file_00000000e0d46230b0cb3139ec953033.png",  // Toolbox (General)
+      lawn: "file_00000000061c62309954b4094aabf893.png",     // Lawn & Outdoor
+      mechanic: "file_000000003f2c61f79ffc24f1fbb273a2.png", // Mechanic
+      builds: "file_00000000fd506230a50b8dc7dfefb9da.png",   // Construction
+      joblog: "Goodgoph.png"                                 // Past Jobs
+    };
 
-  const SERVICES = [
-    {
-      key: 'general', title: 'General Maintenance', hero: IMG.general,
-      list:[
-        'Doors: hinge/strike adjustments, latch/lock installs, weatherstripping, thresholds',
-        'Drywall & Paint: patch holes, texture match, prime/paint walls & trim',
-        'Light Plumbing: faucets, traps, supply lines, toilets (fill/flush valves, wax rings), disposals, caulking',
-        'Light Electrical: fixtures, fans, switches, dimmers, outlets/GFCI, doorbells (low‑voltage)',
-        'Carpentry: baseboards/trim, shelving, closet systems, cabinet hardware, minor framing repairs',
-        'Flooring (small scope): tile pop‑outs & grout repair, LVP/laminate board swaps',
-        'Mount/Install: TVs (wire‑conceal add‑on), blinds, curtain rods, mirrors, pictures',
-        'Assembly: furniture, storage racks, prefab units',
-        'Window cleaning (interior/exterior; screens & sills)',
-        'Basic pest control (ants/roaches; wasp nest removal where safe — no termites)',
-      ]
-    },
-    {
-      key: 'lawn', title: 'Lawn & Outdoor', hero: IMG.lawn,
-      list:[
-        'Trimming/weed‑eating & edging; hedge/bush shaping',
-        'Flowerbeds: design/build, edging, soil amending, mulch install',
-        'Planters & Raised Beds: build/install, fill soil mix, placement',
-        'Garden prep: bed turning, compost/topsoil mix, basic drip/soaker setup',
-        'Cleanup: leaf/brush cleanup (light), haul‑off',
-        'Gutter cleaning (single story)',
-        'Power washing: siding, decks, patios, driveways',
-        'Holiday lights: hanging/removal',
-      ]
-    },
-    {
-      key: 'mechanic', title: 'Mobile Mechanic (Basic to Light Service)', hero: IMG.mechanic,
-      list:[
-        'Battery swap / jump start',
-        'Flat repair / air (where safe), spare changeover',
-        'Wiper & bulb replacement, fluid top‑offs, OBD‑II code read',
-        'Brake jobs (pads / rotors, inspection)',
-        'Oil changes (standard or synthetic; includes filter)',
-        'Spark plug replacement',
-        'Tune‑ups (filters, plugs, belts, fluids)',
-        'Stereo/radio installs & subwoofer wiring',
-      ]
-    },
-    {
-      key: 'builds', title: 'Builds & Construction', hero: IMG.builds,
-      list:[
-        'Porches & small decks — new builds, resurfacing, railings, stairs, skirting, lattice',
-        'Patios (pavers/stone) — base prep, compaction, edging, polymeric sand finish',
-        'Walkways (gravel/paver/stepping stone) — layout, base, edging',
-        'Fencing & gates — wood repairs, small new runs, custom gates, hardware',
-        'Sheds & pergolas — small shed builds, prefab assembly, pergolas/awnings',
-        'Exterior carpentry — fascia/soffit patches, door/sill replacement, trim',
-        'Small interior upgrades — vanity swaps, backsplash installs, accent walls, wainscoting',
-        'Tile & bathroom remodels — surrounds, grout & waterproofing, small bath refreshes',
-        'Concrete (minor) — step patches, small pads/leveling',
-      ]
-    },
-    {
-      key: 'membership', title: 'Membership Plans', hero: IMG.logo,
-      list:[
-        'Gopher Basic — $99/mo • 3 hours • 10% off extra ($36/hr) • 48‑hr priority • roll over 2 months',
-        'Gopher Plus — $199/mo • 6 hours • 15% off extra ($34/hr) • same‑week priority • quarterly perk • roll over 3 months',
-        'Gopher Gold — $349/mo • 10 hours • 20% off extra ($32/hr) • guaranteed slot • free emergency or mobile mechanic service / mo • free travel up to 25mi',
-        'Materials billed separately (+25% when Gopher’s supplies). Cancel anytime.'
-      ]
-    },
-    {
-      key: 'oldproj', title: 'Project Gallery', hero: IMG.joblog,
-      list:['Prior Projects']
+    const SERVICES = [
+      {
+        key: 'general', title: 'General Maintenance', hero: IMG.general,
+        list:[
+          'Doors: hinge/strike adjustments, latch/lock installs, weatherstripping, thresholds',
+          'Drywall & Paint: patch holes, texture match, prime/paint walls & trim',
+          'Light Plumbing: faucets, traps, supply lines, toilets (fill/flush valves, wax rings), disposals, caulking',
+          'Light Electrical: fixtures, fans, switches, dimmers, outlets/GFCI, doorbells (low‑voltage)',
+          'Carpentry: baseboards/trim, shelving, closet systems, cabinet hardware, minor framing repairs',
+          'Flooring (small scope): tile pop‑outs & grout repair, LVP/laminate board swaps',
+          'Mount/Install: TVs (wire‑conceal add‑on), blinds, curtain rods, mirrors, pictures',
+          'Assembly: furniture, storage racks, prefab units',
+          'Window cleaning (interior/exterior; screens & sills)',
+          'Basic pest control (ants/roaches; wasp nest removal where safe — no termites)',
+        ]
+      },
+      {
+        key: 'lawn', title: 'Lawn & Outdoor', hero: IMG.lawn,
+        list:[
+          'Trimming/weed‑eating & edging; hedge/bush shaping',
+          'Flowerbeds: design/build, edging, soil amending, mulch install',
+          'Planters & Raised Beds: build/install, fill soil mix, placement',
+          'Garden prep: bed turning, compost/topsoil mix, basic drip/soaker setup',
+          'Cleanup: leaf/brush cleanup (light), haul‑off',
+          'Gutter cleaning (single story)',
+          'Power washing: siding, decks, patios, driveways',
+          'Holiday lights: hanging/removal',
+        ]
+      },
+      {
+        key: 'mechanic', title: 'Mobile Mechanic (Basic to Light Service)', hero: IMG.mechanic,
+        list:[
+          'Battery swap / jump start',
+          'Flat repair / air (where safe), spare changeover',
+          'Wiper & bulb replacement, fluid top‑offs, OBD‑II code read',
+          'Brake jobs (pads / rotors, inspection)',
+          'Oil changes (standard or synthetic; includes filter)',
+          'Spark plug replacement',
+          'Tune‑ups (filters, plugs, belts, fluids)',
+          'Stereo/radio installs & subwoofer wiring',
+        ]
+      },
+      {
+        key: 'builds', title: 'Builds & Construction', hero: IMG.builds,
+        list:[
+          'Porches & small decks — new builds, resurfacing, railings, stairs, skirting, lattice',
+          'Patios (pavers/stone) — base prep, compaction, edging, polymeric sand finish',
+          'Walkways (gravel/paver/stepping stone) — layout, base, edging',
+          'Fencing & gates — wood repairs, small new runs, custom gates, hardware',
+          'Sheds & pergolas — small shed builds, prefab assembly, pergolas/awnings',
+          'Exterior carpentry — fascia/soffit patches, door/sill replacement, trim',
+          'Small interior upgrades — vanity swaps, backsplash installs, accent walls, wainscoting',
+          'Tile & bathroom remodels — surrounds, grout & waterproofing, small bath refreshes',
+          'Concrete (minor) — step patches, small pads/leveling',
+        ]
+      },
+      {
+        key: 'membership', title: 'Membership Plans', hero: IMG.logo,
+        list:[
+          'Gopher Basic — $99/mo • 3 hours • 10% off extra ($36/hr) • 48‑hr priority • roll over 2 months',
+          'Gopher Plus — $199/mo • 6 hours • 15% off extra ($34/hr) • same‑week priority • quarterly perk • roll over 3 months',
+          'Gopher Gold — $349/mo • 10 hours • 20% off extra ($32/hr) • guaranteed slot • free emergency or mobile mechanic service / mo • free travel up to 25mi',
+          'Materials billed separately (+25% when Gopher’s supplies). Cancel anytime.'
+        ]
+      },
+      {
+        key: 'oldproj', title: 'Project Gallery', hero: IMG.joblog,
+        list: ['Prior Projects']
+      }
+    ];
 
-      
+    // ----- RENDER -----
+    let active = 'general';
+    const $ = s => document.querySelector(s);
+    const $$ = s => document.querySelectorAll(s);
+
+    function renderTabs(){
+      const bar = $('#tabBar');
+      bar.innerHTML = SERVICES.map(s=> `
+        <button class="tab ${active===s.key?'active':'inactive'}" data-tab="${s.key}">${s.title}</button>
+      `).join('');
+      $$('#tabBar .tab').forEach(btn=> btn.onclick = () => { active = btn.dataset.tab; renderSection(); renderTabs(); });
     }
-  ];
 
-  // ----- RENDER -----
-  let active = 'general';
-  const $ = s => document.querySelector(s);
-  const $$ = s => document.querySelectorAll(s);
+    function renderSection(){
+      const sec = $('#sectionArea');
+      const group = SERVICES.find(s=> s.key === active);
 
-  function renderTabs(){
-    const bar = $('#tabBar');
-    bar.innerHTML = SERVICES.map(s=> `
-      <button class="tab ${active===s.key?'active':'inactive'}" data-tab="${s.key}">${s.title}</button>
-    `).join('');
-    $$('#tabBar .tab').forEach(btn=> btn.onclick = () => { active = btn.dataset.tab; renderSection(); renderTabs(); });
-  }
+      // Special layout for oldproj
+      if (active === 'oldproj') {
+        sec.innerHTML = `
+          <div class="flex flex-col space-y-6">
+            <div class="card p-6">
+              <div class="grid grid-cols-2 gap-4 mb-4 text-center">
+                <div class="font-bold text-stone-700">Before</div>
+                <div class="font-bold text-stone-700">After</div>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <img src="file_00000000before.jpg" alt="Before: description of the job" class="w-full h-auto rounded-lg object-cover">
+                <img src="file_00000000after.jpg"  alt="After: description of the job"  class="w-full h-auto rounded-lg object-cover">
+              </div>
+            </div>
+          </div>
+        `;
+        return;
+      }
 
-  function renderSection(){
-    const sec = $('#sectionArea');
-    const group = SERVICES.find(s=> s.key===active);
-    sec.innerHTML = `
-      <div class="card overflow-hidden">
-        <div class="w-full h-64 sm:h-80 bg-amber-50 flex items-center justify-center">
-          <img src="${group.hero}" alt="${group.title}" class="max-h-full w-auto object-contain fade-in" onload="this.classList.add('show')">
+      // Default layout for all other tabs
+      sec.innerHTML = `
+        <div class="card overflow-hidden">
+          <div class="w-full h-64 sm:h-80 bg-amber-50 flex items-center justify-center">
+            <img src="${group.hero}" alt="${group.title}" class="max-h-full w-auto object-contain fade-in" onload="this.classList.add('show')">
+          </div>
+          <div class="p-4 sm:p-6">
+            <h2 class="text-2xl font-extrabold mb-2">${group.title}</h2>
+            <ul class="list-disc pl-5 space-y-1">
+              ${group.list.map(item=>`<li>${item}</li>`).join('')}
+            </ul>
+          </div>
         </div>
-        <div class="p-4 sm:p-6">
-          <h2 class="text-2xl font-extrabold mb-2">${group.title}</h2>
-          <ul class="list-disc pl-5 space-y-1">
-            ${group.list.map(item=>`<li>${item}</li>`).join('')}
-          </ul>
-        </div>
-      </div>
-    `;
-  }if (active === 'oldproj') {
-  sec.innerHTML = `
-    <div class="flex flex-col space-y-6">
-      <div class="card p-6">
-        <div class="grid grid-cols-2 gap-4 mb-4 text-center">
-          <div class="font-bold text-stone-700">Before</div>
-          <div class="font-bold text-stone-700">After</div>
-        </div>
-        <div class="grid grid-cols-2 gap-4">
-          <img src="file_00000000before.jpg" alt="Before: description of the job" class="w-full h-auto rounded-lg object-cover">
-          <img src="file_00000000after.jpg"  alt="After: description of the job"  class="w-full h-auto rounded-lg object-cover">
-        </div>
-      </div>
-    </div>
-  `;
-  return;
-  }
+      `;
+    }
 
-  // ----- INIT -----
-  document.getElementById('logoImg').src = IMG.logo;
-  document.getElementById('yr').innerText = new Date().getFullYear();
-  renderTabs();
-  renderSection();
+    // ----- INIT -----
+    document.getElementById('logoImg').src = IMG.logo;
+    document.getElementById('yr').innerText = new Date().getFullYear();
+    renderTabs();
+    renderSection();
   </script>
 </body>
-</html>
+        </html>
