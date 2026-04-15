@@ -146,7 +146,7 @@
       },
       {
         key: 'oldproj', title: 'Project Gallery', hero: IMG.joblog,
-        list: ['Prior Projects']
+        list:['Prior Projects']
       }
     ];
 
@@ -167,7 +167,7 @@
       const sec = $('#sectionArea');
       const group = SERVICES.find(s=> s.key === active);
 
-      // Special layout for oldproj
+      // Special layout for Project Gallery
       if (active === 'oldproj') {
         sec.innerHTML = `
           <div class="flex flex-col space-y-6">
@@ -195,7 +195,7 @@
           <div class="p-4 sm:p-6">
             <h2 class="text-2xl font-extrabold mb-2">${group.title}</h2>
             <ul class="list-disc pl-5 space-y-1">
-              ${group.list.map(item=>`<li>${item}</li>`).join('')}
+              ${group.list.map(item=>`>${item}</li>`).join('')}
             </ul>
           </div>
         </div>
@@ -209,4 +209,4 @@
     renderSection();
   </script>
 </body>
-        </html>
+</html>
