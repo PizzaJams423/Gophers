@@ -168,51 +168,58 @@
       const group = SERVICES.find(s=> s.key === active);
 
       // Special layout for Project Gallery
-      if (active === 'oldproj') {
-        sec.innerHTML = `
-          <div class="w-full h-64 sm:h-80 bg-amber-50 flex items-center justify-center">
-            <img src="${group.hero}" alt="${group.title}" class="max-h-full w-auto object-contain fade-in" onload="this.classList.add('show')">
-          </div>
-          <div class="flex flex-col space-y-6">
-            <div class="card p-6">
-            <div class="bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-t-lg mb-4">
-          Paint, Countertops, and LVP
+
+if (active === 'oldproj') {
+  sec.innerHTML = `
+    <div class="flex flex-col space-y-6">
+      <div class="card overflow-hidden">
+        <div class="w-full h-64 sm:h-80 bg-amber-50 flex items-center justify-center">
+          <img src="${group.hero}" alt="${group.title}" class="max-h-full w-auto object-contain fade-in" onload="this.classList.add('show')">
         </div>
-              <div class="grid grid-cols-2 gap-4 mb-4 text-center">
-                <div class="font-bold text-stone-700">Before</div>
-                <div class="font-bold text-stone-700">After</div>
+
+        <div class="p-4 sm:p-6 space-y-6">
+          <div class="card p-4 sm:p-6 border border-stone-200">
+            <div class="bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-lg mb-4">
+              LVP, Countertops, and Paint
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4 text-center">
+              <div class="font-bold text-stone-700">Before</div>
+              <div class="font-bold text-stone-700">After</div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100">
+                <img src="file_00000000before.jpg" alt="Before: LVP, countertops, and paint project" class="w-full h-full object-cover">
               </div>
-              <div class="grid grid-cols-2 gap-4">
-                <img src="Clarklvpb4.jpg" alt="Before: description of the job" class="w-full h-auto rounded-lg object-cover">
-                <img src="Clark-lvp.webp"  alt="After: description of the job"  class="w-full h-auto rounded-lg object-cover">
-                <img src="ClarkKitb4.jpg" alt="Before: description of the job" class="w-full h-auto rounded-lg object-cover">
-                <img src="Clark_kit.webp"  alt="After: description of the job"  class="w-full h-auto rounded-lg object-cover">
-                <img src="ClarkdiningB4.jpg" alt="Before: description of the job" class="w-full h-auto rounded-lg object-cover">
-                <img src="Clark_dining.webp"  alt="After: description of the job"  class="w-full h-auto rounded-lg object-cover">
+              <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100">
+                <img src="Clark-lvp.webp" alt="After: LVP, countertops, and paint project" class="w-full h-full object-cover">
               </div>
             </div>
           </div>
-        
-        <div class="bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-t-lg mb-4">
-          Bathroom Remodel
-        </div>
-              <div class="grid grid-cols-2 gap-4 mb-4 text-center">
-                <div class="font-bold text-stone-700">Before</div>
-                <div class="font-bold text-stone-700">After</div>
-              </div>
-              <div class="grid grid-cols-2 gap-4">
-                <img src="bathroombef1.jpg" alt="Before: description of the job" class="w-full h-auto rounded-lg object-cover">
-                <img src="bathroomaft1.jpg" alt="Before: description of the job" class="w-full h-auto rounded-lg object-cover">
-                <img src="bathroombef2.jpg" alt="Before: description of the job" class="w-full h-auto rounded-lg object-cover">
-                <img src="bathroomaft2.jpg" alt="Before: description of the job" class="w-full h-auto rounded-lg object-cover">
-              </div>
-          
-        
-return;
 
-`
-       
-      
+          <div class="card p-4 sm:p-6 border border-stone-200">
+            <div class="bg-amber-400 text-stone-900 text-sm font-semibold px-4 py-2 rounded-lg mb-4">
+              Bathroom Remodel
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4 text-center">
+              <div class="font-bold text-stone-700">Before</div>
+              <div class="font-bold text-stone-700">After</div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100">
+                <img src="file_00000000bath-before.jpg" alt="Before: bathroom remodel" class="w-full h-full object-cover">
+              </div>
+              <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100">
+                <img src="Clark_kit.webp" alt="After: bathroom remodel" class="w-full h-full object-cover">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  return;
+}
+
 
 
 
