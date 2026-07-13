@@ -120,7 +120,9 @@
     const gopherChatForm=document.getElementById('chatForm');
     const gopherChatInput=document.getElementById('chatInput');
     const gopherChatLog=document.getElementById('chatLog');
-    let gopherChatLastFocus=null; let dragState=null; const pad=12; const defaultBottomBarId='bottomCTA';
+    let gopherChatLastFocus = null;
+    let dragState = null;
+    let suppressNextClick = false; const pad=12; const defaultBottomBarId='bottomCTA';
     function getBottomBarHeight(){const bar=document.getElementById(defaultBottomBarId); if(!bar) return 0; const rect=bar.getBoundingClientRect(); return rect.height || bar.offsetHeight || 0;}
     function updateFooterOffsetVar(){document.documentElement.style.setProperty('--gopher-footer-offset', `${getBottomBarHeight()}px`)}
     function setWidgetPosition(right,bottom){gopherChatLauncher.style.right=`${right}px`; gopherChatLauncher.style.bottom=`${bottom}px`; gopherChatPanel.style.right=`${right}px`; gopherChatPanel.style.bottom=`${bottom+76}px`; gopherChatPanel.style.left='auto'}
@@ -128,11 +130,32 @@
     function snapToEdge(){const rect=gopherChatLauncher.getBoundingClientRect(); const rightDist=window.innerWidth-rect.right; const leftDist=rect.left; const targetRight=rightDist<=leftDist ? Math.max(pad, rightDist) : Math.max(pad, window.innerWidth-rect.left-rect.width); const barHeight=getBottomBarHeight(); const targetBottom=Math.max(pad, window.innerHeight-rect.bottom, barHeight + pad); setWidgetPosition(targetRight, targetBottom)}
     function startDrag(e){if(e.type==='mousedown'&&e.button!==0) return; const point=e.touches?e.touches[0]:e; const rect=gopherChatLauncher.getBoundingClientRect(); dragState={startX:point.clientX,startY:point.clientY,startRight:window.innerWidth-rect.right,startBottom:window.innerHeight-rect.bottom,moved:false}; document.addEventListener('mousemove', onDragMove); document.addEventListener('mouseup', endDrag); document.addEventListener('touchmove', onDragMove, { passive:false }); document.addEventListener('touchend', endDrag); if(e.cancelable) e.preventDefault();}
     function onDragMove(e){if(!dragState) return; const point=e.touches?e.touches[0]:e; const dx=point.clientX-dragState.startX; const dy=point.clientY-dragState.startY; if(Math.abs(dx)+Math.abs(dy)>4) dragState.moved=true; const nextRight=Math.max(12, dragState.startRight-dx); const nextBottom=Math.max(12, dragState.startBottom-dy); setWidgetPosition(nextRight,nextBottom); if(e.cancelable) e.preventDefault();}
-    function endDrag(){document.removeEventListener('mousemove', onDragMove); document.removeEventListener('mouseup', endDrag); document.removeEventListener('touchmove', onDragMove); document.removeEventListener('touchend', endDrag); if(dragState?.moved) snapToEdge(); dragState=null;}
+    function endDrag() {
+  document.removeEventListener('mousemove', onDragMove);
+  document.removeEventListener('mouseup', endDrag);
+  document.removeEventListener('touchmove', onDragMove);
+  document.removeEventListener('touchend', endDrag);
+
+  if (dragState?.moved) {
+    suppressNextClick = true;
+    setTimeout(() => { suppressNextClick = false; }, 0);
+    snapToEdge();
+  }
+
+  dragState = null;
+    }
+    
     function gopherChatSetOpen(isOpen){gopherChatPanel.dataset.open=String(isOpen); gopherChatLauncher.setAttribute('aria-expanded',String(isOpen)); if(isOpen){gopherChatLastFocus=document.activeElement; if(!window.matchMedia('(max-width: 640px)').matches) gopherChatInput.focus();} else if(gopherChatLastFocus) gopherChatLastFocus.focus();}
     function gopherChatAppendMessage(text,who='bot'){const row=document.createElement('div'); row.className=`chat-row ${who}`; const bubble=document.createElement('div'); bubble.className='bubble'; bubble.textContent=text; row.appendChild(bubble); gopherChatLog.appendChild(row); gopherChatLog.scrollTop=gopherChatLog.scrollHeight;}
     gopherChatInput.addEventListener('focus',()=>{gopherChatInput.removeAttribute('readonly')});
-    gopherChatLauncher.addEventListener('mousedown', startDrag); gopherChatLauncher.addEventListener('touchstart', startDrag, { passive:false }); gopherChatLauncher.addEventListener('click',(event)=>{if(dragState?.moved){event.preventDefault(); return;} gopherChatSetOpen(gopherChatPanel.dataset.open!=='true');});
+    gopherChatLauncher.addEventListener('mousedown', startDrag); gopherChatLauncher.addEventListener('touchstart', startDrag, { passive:false }); 
+    gopherChatLauncher.addEventListener('click', (event) => {
+  if (suppressNextClick || dragState?.moved) {
+    event.preventDefault();
+    return;
+  }
+  gopherChatSetOpen(gopherChatPanel.dataset.open !== 'true');
+});
     gopherChatClose.addEventListener('click',()=>gopherChatSetOpen(false)); document.addEventListener('keydown',(event)=>{if(event.key==='Escape'&&gopherChatPanel.dataset.open==='true') gopherChatSetOpen(false);});
     const CHATBOT_API_URL='PASTE-YOUR-CHATBOT-ENDPOINT-HERE';
     async function gopherChatGetReply(message){if(CHATBOT_API_URL==='PASTE-YOUR-CHATBOT-ENDPOINT-HERE'){return 'Sample mode: the widget is installed correctly. When your chatbot API is ready, paste the endpoint URL into CHATBOT_API_URL.';} const response=await fetch(CHATBOT_API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message})}); if(!response.ok) throw new Error('Chatbot request failed.'); const data=await response.json(); return data.reply || 'Sorry, I could not generate a reply just now.';}
