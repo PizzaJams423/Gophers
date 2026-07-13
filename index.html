@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -10,44 +9,272 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    html,body{background:#fff7ed}
-    .fade-in{opacity:0;transition:opacity .35s ease-in}
-    .fade-in.show{opacity:1}
-    .tab{border-radius:1rem;padding:.5rem .75rem;font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
-    .tab.active{background:#f59e0b;color:#fff}
-    .tab.inactive{background:#fff}
-    .tab.inactive:hover{background:#fffbeb}
-    .card{background:#fff;border-radius:1rem;box-shadow:0 1px 4px rgba(0,0,0,.08)}
-    :root{--gopher-footer-offset:0px}
-    .chat-launcher,.chat-panel,.chat-panel *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    .chat-launcher{position:fixed;right:20px;bottom:calc(var(--gopher-footer-offset, 0px) + 20px);width:64px;height:64px;border:0;border-radius:999px;background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#fff;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 16px 34px rgba(245,158,11,.34);cursor:pointer;z-index:99999;transition:transform 180ms ease,box-shadow 180ms ease;touch-action:none;user-select:none}
-    .chat-launcher:hover{transform:translateY(-1px);box-shadow:0 18px 38px rgba(245,158,11,.38)}
-    .chat-launcher:focus-visible,.chat-close:focus-visible,.chat-send:focus-visible,.chat-input:focus-visible{outline:3px solid rgba(245,158,11,.30);outline-offset:3px}
-    .chat-panel{position:fixed;right:20px;bottom:calc(var(--gopher-footer-offset, 0px) + 96px);width:min(380px,calc(100vw - 24px));height:min(620px,calc(100vh - 120px));background:#fffaf1;border:1px solid rgba(180,83,9,.16);border-radius:22px;box-shadow:0 18px 50px rgba(180,83,9,.18);overflow:hidden;display:none;flex-direction:column;z-index:99999}
-    .chat-panel[data-open="true"]{display:flex}
-    .chat-header{background:linear-gradient(135deg,#b45309,#f59e0b);color:#fff;padding:18px 18px 16px;display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
-    .chat-title{margin:0;font-family:"Fraunces",Georgia,serif;font-size:1.16rem;font-weight:700;letter-spacing:-.02em}
-    .chat-subtitle{margin:6px 0 0;font-size:.92rem;line-height:1.45;color:rgba(255,255,255,.9)}
-    .chat-close{width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);color:#fff;cursor:pointer;flex:0 0 auto}
-    .chat-body{flex:1;overflow:auto;padding:16px;background:linear-gradient(180deg,#fffdf8 0%,#fff7ed 100%)}
-    .chat-row{display:flex;margin-bottom:12px}.chat-row.bot{justify-content:flex-start}.chat-row.user{justify-content:flex-end}
-    .bubble{max-width:84%;padding:12px 14px;border-radius:16px;font-size:.96rem;line-height:1.58;white-space:pre-wrap}
-    .bot .bubble{background:#fffbeb;border:1px solid rgba(245,158,11,.12);color:#292524;border-bottom-left-radius:6px}
-    .user .bubble{background:#f59e0b;color:#fff;border-bottom-right-radius:6px}
-    .chat-footer{border-top:1px solid rgba(245,158,11,.12);padding:12px;background:#fff}
-    .chat-note{font-size:.76rem;color:#57534e;margin:0 0 10px}
-    .chat-form{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
-    .chat-input{width:100%;min-height:48px;max-height:120px;resize:vertical;border:1px solid rgba(245,158,11,.18);border-radius:14px;padding:12px 14px;font:inherit;color:#292524;background:#fff}
-    .chat-send{min-width:52px;height:48px;padding:0 16px;border:0;border-radius:14px;background:#f59e0b;color:#fff;font-weight:700;cursor:pointer}
-    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-    @media (max-width:640px){
-      .chat-launcher{right:16px;bottom:calc(var(--gopher-footer-offset, 0px) + 16px);width:60px;height:60px}
-      .chat-panel{right:12px;left:12px;bottom:calc(var(--gopher-footer-offset, 0px) + 72px);width:auto;height:min(72vh,560px)}
+    html, body {
+      background: #fff7ed;
     }
-    @media (prefers-reduced-motion:reduce){.chat-launcher,.chat-panel,.chat-panel *{transition:none !important;scroll-behavior:auto}}
+
+    :root {
+      --gopher-footer-offset: 0px;
+      --chat-z: 99999;
+    }
+
+    .fade-in {
+      opacity: 0;
+      transition: opacity .35s ease-in;
+    }
+
+    .fade-in.show {
+      opacity: 1;
+    }
+
+    .tab {
+      border-radius: 1rem;
+      padding: .5rem .75rem;
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .08);
+    }
+
+    .tab.active {
+      background: #f59e0b;
+      color: #fff;
+    }
+
+    .tab.inactive {
+      background: #fff;
+    }
+
+    .tab.inactive:hover {
+      background: #fffbeb;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 1rem;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .08);
+    }
+
+    .chat-launcher,
+    .chat-panel,
+    .chat-panel * {
+      box-sizing: border-box;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .chat-launcher {
+      position: fixed;
+      right: 20px;
+      bottom: calc(var(--gopher-footer-offset, 0px) + 20px);
+      width: 64px;
+      height: 64px;
+      border: 0;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #f59e0b, #fbbf24);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 16px 34px rgba(245, 158, 11, 0.34);
+      cursor: pointer;
+      z-index: var(--chat-z);
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .chat-launcher:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 38px rgba(245, 158, 11, 0.38);
+    }
+
+    .chat-launcher:focus-visible,
+    .chat-close:focus-visible,
+    .chat-send:focus-visible,
+    .chat-input:focus-visible {
+      outline: 3px solid rgba(245, 158, 11, 0.30);
+      outline-offset: 3px;
+    }
+
+    .chat-panel {
+      position: fixed;
+      right: 20px;
+      bottom: calc(var(--gopher-footer-offset, 0px) + 96px);
+      width: min(380px, calc(100vw - 24px));
+      height: min(620px, calc(100vh - 120px));
+      background: #fffaf1;
+      border: 1px solid rgba(180, 83, 9, 0.16);
+      border-radius: 22px;
+      box-shadow: 0 18px 50px rgba(180, 83, 9, 0.18);
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      z-index: var(--chat-z);
+    }
+
+    .chat-panel[data-open="true"] {
+      display: flex;
+    }
+
+    .chat-header {
+      background: linear-gradient(135deg, #b45309, #f59e0b);
+      color: #fff;
+      padding: 18px 18px 16px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .chat-title {
+      margin: 0;
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 1.16rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .chat-subtitle {
+      margin: 6px 0 0;
+      font-size: .92rem;
+      line-height: 1.45;
+      color: rgba(255, 255, 255, .9);
+    }
+
+    .chat-close {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, .22);
+      background: rgba(255, 255, 255, .12);
+      color: #fff;
+      cursor: pointer;
+      flex: 0 0 auto;
+    }
+
+    .chat-body {
+      flex: 1;
+      overflow: auto;
+      padding: 16px;
+      background: linear-gradient(180deg, #fffdf8 0%, #fff7ed 100%);
+    }
+
+    .chat-row {
+      display: flex;
+      margin-bottom: 12px;
+    }
+
+    .chat-row.bot {
+      justify-content: flex-start;
+    }
+
+    .chat-row.user {
+      justify-content: flex-end;
+    }
+
+    .bubble {
+      max-width: 84%;
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-size: 0.96rem;
+      line-height: 1.58;
+      white-space: pre-wrap;
+    }
+
+    .bot .bubble {
+      background: #fffbeb;
+      border: 1px solid rgba(245, 158, 11, 0.12);
+      color: #292524;
+      border-bottom-left-radius: 6px;
+    }
+
+    .user .bubble {
+      background: #f59e0b;
+      color: #fff;
+      border-bottom-right-radius: 6px;
+    }
+
+    .chat-footer {
+      border-top: 1px solid rgba(245, 158, 11, 0.12);
+      padding: 12px;
+      background: #fff;
+    }
+
+    .chat-note {
+      font-size: 0.76rem;
+      color: #57534e;
+      margin: 0 0 10px;
+    }
+
+    .chat-form {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .chat-input {
+      width: 100%;
+      min-height: 48px;
+      max-height: 120px;
+      resize: vertical;
+      border: 1px solid rgba(245, 158, 11, 0.18);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font: inherit;
+      color: #292524;
+      background: #fff;
+    }
+
+    .chat-send {
+      min-width: 52px;
+      height: 48px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 14px;
+      background: #f59e0b;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 640px) {
+      .chat-launcher {
+        right: 16px;
+        bottom: calc(var(--gopher-footer-offset, 0px) + 16px);
+        width: 60px;
+        height: 60px;
+      }
+
+      .chat-panel {
+        right: 12px;
+        left: 12px;
+        bottom: calc(var(--gopher-footer-offset, 0px) + 72px);
+        width: auto;
+        height: min(72vh, 560px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .chat-launcher,
+      .chat-panel,
+      .chat-panel * {
+        transition: none !important;
+        scroll-behavior: auto;
+      }
+    }
   </style>
 </head>
 <body class="text-stone-900">
+  <!-- Mobile CTA Bar -->
   <div id="bottomCTA" class="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-white/95 backdrop-blur border-t border-stone-200 shadow-[0_-2px_10px_rgba(0,0,0,0.08)]">
     <div class="grid grid-cols-2 gap-2 p-3">
       <a href="tel:+14238882856" class="flex items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-white font-semibold shadow active:scale-[0.99]" aria-label="Call Gopher at 423-888-2856">Call</a>
@@ -55,6 +282,7 @@
     </div>
   </div>
 
+  <!-- Header -->
   <header class="sticky top-0 z-40 bg-amber-100/80 backdrop-blur border-b border-amber-200">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
       <img id="logoImg" class="h-10 w-auto rounded" alt="Gopher's logo">
@@ -63,9 +291,13 @@
     </div>
   </header>
 
+  <!-- Navigation -->
   <nav id="tabBar" class="max-w-6xl mx-auto px-2 pt-3 grid grid-cols-2 sm:grid-cols-5 gap-2"></nav>
+
+  <!-- Content -->
   <main id="sectionArea" class="max-w-6xl mx-auto px-4 py-6 pb-24 sm:pb-6"></main>
 
+  <!-- CTA Card -->
   <section class="max-w-6xl mx-auto px-4 py-4">
     <div class="card p-4">
       <div class="w-full flex items-center justify-center mb-3">
@@ -80,21 +312,30 @@
 
   <footer class="text-center text-sm text-stone-600 py-8">© <span id="yr"></span> Gopher’s Handyman Service — Chattanooga, TN</footer>
 
+  <!-- Chat Launcher -->
   <button class="chat-launcher" id="chatLauncher" aria-controls="chatPanel" aria-expanded="false" aria-label="Open chat">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 10h8M8 14h5m-7 6 1.6-3.2A8 8 0 1 1 20 12a8 8 0 0 1-8 8H6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M8 10h8M8 14h5m-7 6 1.6-3.2A8 8 0 1 1 20 12a8 8 0 0 1-8 8H6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
   </button>
 
+  <!-- Chat Panel -->
   <section class="chat-panel" id="chatPanel" aria-label="Website chat" data-open="false">
     <header class="chat-header">
       <div style="display:flex;align-items:center;gap:12px;">
         <img src="https://pizzajams423.github.io/Gophers/file_00000000c3f861f9a55091d9ba0f1f3d.png" alt="Gopher's logo" width="44" height="44" style="width:44px;height:44px;border-radius:999px;object-fit:cover;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);box-shadow:0 3px 10px rgba(0,0,0,.12);" loading="lazy">
-        <div><h2 class="chat-title">Gopher's Estimate Bot</h2></div>
+        <div>
+          <h2 class="chat-title">Gopher's Estimate Bot</h2>
+          <p class="chat-subtitle">Ask for a quick estimate.</p>
+        </div>
       </div>
       <button class="chat-close" id="chatClose" aria-label="Close chat">✕</button>
     </header>
 
     <div class="chat-body" id="chatLog" role="log" aria-live="polite" aria-relevant="additions text">
-      <div class="chat-row bot"><div class="bubble">Hey there! Thanks for choosing Gopher’s! Tell us a little more about your job and we'll give you an estimate!</div></div>
+      <div class="chat-row bot">
+        <div class="bubble">Hey there! Thanks for choosing Gopher’s! Tell us a little more about your job and we'll give you an estimate!</div>
+      </div>
     </div>
 
     <footer class="chat-footer">
@@ -108,111 +349,308 @@
   </section>
 
   <script>
-    const IMG = {logo:"file_00000000c3f861f9a55091d9ba0f1f3d.png",general:"file_00000000e0d46230b0cb3139ec953033.png",lawn:"file_00000000061c62309954b4094aabf893.png",mechanic:"file_000000003f2c61f79ffc24f1fbb273a2.png",builds:"file_00000000fd506230a50b8dc7dfefb9da.png",joblog:"Goodgoph.png"};
-    const SERVICES=[{key:'general',title:'General Maintenance',hero:IMG.general,list:['Doors: hinge/strike adjustments, latch/lock installs, weatherstripping, thresholds','Drywall & Paint: patch holes, texture match, prime/paint walls & trim','Light Plumbing: faucets, traps, supply lines, toilets (fill/flush valves, wax rings), disposals, caulking','Light Electrical: fixtures, fans, switches, dimmers, outlets/GFCI, doorbells (low‑voltage)','Carpentry: baseboards/trim, shelving, closet systems, cabinet hardware, minor framing repairs','Flooring (small scope): tile pop‑outs & grout repair, LVP/laminate board swaps','Mount/Install: TVs (wire‑conceal add‑on), blinds, curtain rods, mirrors, pictures','Assembly: furniture, storage racks, prefab units','Window cleaning (interior/exterior; screens & sills)','Basic pest control (ants/roaches; wasp nest removal where safe — no termites)']},{key:'lawn',title:'Lawn & Outdoor',hero:IMG.lawn,list:['Trimming/weed‑eating & edging; hedge/bush shaping','Flowerbeds: design/build, edging, soil amending, mulch install','Planters & Raised Beds: build/install, fill soil mix, placement','Garden prep: bed turning, compost/topsoil mix, basic drip/soaker setup','Cleanup: leaf/brush cleanup (light), haul‑off','Gutter cleaning (single story)','Power washing: siding, decks, patios, driveways','Holiday lights: hanging/removal']},{key:'mechanic',title:'Mobile Mechanic (Basic to Light Service)',hero:IMG.mechanic,list:['Battery swap / jump start','Flat repair / air (where safe), spare changeover','Wiper & bulb replacement, fluid top‑offs, OBD‑II code read','Brake jobs (pads / rotors, inspection)','Oil changes (standard or synthetic; includes filter)','Spark plug replacement','Tune‑ups (filters, plugs, belts, fluids)','Stereo/radio installs & subwoofer wiring']},{key:'builds',title:'Builds & Construction',hero:IMG.builds,list:['Porches & small decks — new builds, resurfacing, railings, stairs, skirting, lattice','Patios (pavers/stone) — base prep, compaction, edging, polymeric sand finish','Walkways (gravel/paver/stepping stone) — layout, base, edging','Fencing & gates — wood repairs, small new runs, custom gates, hardware','Sheds & pergolas — small shed builds, prefab assembly, pergolas/awnings','Exterior carpentry — fascia/soffit patches, door/sill replacement, trim','Small interior upgrades — vanity swaps, backsplash installs, accent walls, wainscoting','Tile & bathroom remodels — surrounds, grout & waterproofing, small bath refreshes','Concrete (minor) — step patches, small pads/leveling']},{key:'membership',title:'Membership Plans',hero:IMG.logo,list:['Gopher Basic — $99/mo • 3 hours • 10% off extra ($36/hr) • 48‑hr priority • roll over 2 months','Gopher Plus — $199/mo • 6 hours • 15% off extra ($34/hr) • same‑week priority • quarterly perk • roll over 3 months','Gopher Gold — $349/mo • 10 hours • 20% off extra ($32/hr) • guaranteed slot • free emergency or mobile mechanic service / mo • free travel up to 25mi','Materials billed separately (+25% when Gopher’s supplies). Cancel anytime.']},{key:'oldproj',title:'Project Gallery',hero:IMG.joblog,list:['Prior Projects']}];
-    let active='general'; const $=s=>document.querySelector(s); const $$=s=>document.querySelectorAll(s);
-    function renderTabs(){const bar=$('#tabBar');bar.innerHTML=SERVICES.map(s=>`<button class="tab ${active===s.key?'active':'inactive'}" data-tab="${s.key}">${s.title}</button>`).join(''); $$('#tabBar .tab').forEach(btn=>btn.onclick=()=>{active=btn.dataset.tab;renderSection();renderTabs();});}
-    function renderSection(){const sec=$('#sectionArea');const group=SERVICES.find(s=>s.key===active); if(active==='oldproj'){sec.innerHTML=`<div class="flex flex-col space-y-6"><div class="card overflow-hidden"><div class="w-full h-64 sm:h-80 bg-amber-50 flex items-center justify-center"><img src="${group.hero}" alt="${group.title}" class="max-h-full w-auto object-contain fade-in" onload="this.classList.add('show')"></div><div class="p-4 sm:p-6 space-y-6"><div class="card p-4 sm:p-6 border border-stone-200"><div class="bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-lg mb-4">LVP, Countertops, and Paint</div><div class="grid grid-cols-2 gap-4 mb-4 text-center"><div class="font-bold text-stone-700">Before</div><div class="font-bold text-stone-700">After</div></div><div class="grid grid-cols-2 gap-4"><div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clarklvpb4.jpg" alt="Before: LVP, countertops, and paint project" class="w-full h-full object-cover"></div><div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clark-lvp.webp" alt="After: LVP, countertops, and paint project" class="w-full h-full object-cover"></div><div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="ClarkKitb4.jpg" alt="Before: LVP, countertops, and paint project" class="w-full h-full object-cover"></div><div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clark_kit.webp" alt="After: LVP, countertops, and paint project" class="w-full h-full object-cover"></div><div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="ClarkdiningB4.jpg" alt="Before: LVP, countertops, and paint project" class="w-full h-full object-cover"></div><div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clark_dining.webp" alt="After: LVP, countertops, and paint project" class="w-full h-full object-cover"></div></div></div><div class="card p-4 sm:p-6 border border-stone-200"><div class="bg-amber-400 text-stone-900 text-sm font-semibold px-4 py-2 rounded-lg mb-4">Bathroom Remodel</div><div class="grid grid-cols-2 gap-4 mb-4 text-center"><div class="font-bold text-stone-700">Before</div><div class="font-bold text-stone-700">After</div></div><div class="grid grid-cols-2 gap-4"><div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="bathroombef1.jpg" alt="Before: bathroom remodel" class="w-full h-full object-cover"></div><div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="bathroomaft1.webp" alt="After: bathroom remodel" class="w-full h-full object-cover"></div><div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="bathroombef2.jpg" alt="Before: bathroom remodel" class="w-full h-full object-cover"></div><div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="bathroomaft2.webp" alt="After: bathroom remodel" class="w-full h-full object-cover"></div></div></div></div></div></div>`;return;} sec.innerHTML=`<div class="card overflow-hidden"><div class="w-full h-64 sm:h-80 bg-amber-50 flex items-center justify-center"><img src="${group.hero}" alt="${group.title}" class="max-h-full w-auto object-contain fade-in" onload="this.classList.add('show')"></div><div class="p-4 sm:p-6"><h2 class="text-2xl font-extrabold mb-2">${group.title}</h2><ul class="list-disc pl-5 space-y-1">${group.list.map(item=>`<li>${item}</li>`).join('')}</ul></div></div>`;}
-    document.getElementById('logoImg').src=IMG.logo; document.getElementById('yr').innerText=new Date().getFullYear(); renderTabs(); renderSection();
+    // =========================
+    // DATA
+    // =========================
+    const IMG = {
+      logo: "file_00000000c3f861f9a55091d9ba0f1f3d.png",
+      general: "file_00000000e0d46230b0cb3139ec953033.png",
+      lawn: "file_00000000061c62309954b4094aabf893.png",
+      mechanic: "file_000000003f2c61f79ffc24f1fbb273a2.png",
+      builds: "file_00000000fd506230a50b8dc7dfefb9da.png",
+      joblog: "Goodgoph.png"
+    };
 
-    
-  const gopherChatLauncher = document.getElementById('chatLauncher');
-  const gopherChatPanel = document.getElementById('chatPanel');
-  const gopherChatClose = document.getElementById('chatClose');
-  const gopherChatInput = document.getElementById('chatInput');
-  const gopherChatLog = document.getElementById('chatLog');
+    const SERVICES = [
+      {
+        key: 'general',
+        title: 'General Maintenance',
+        hero: IMG.general,
+        list: [
+          'Doors: hinge/strike adjustments, latch/lock installs, weatherstripping, thresholds',
+          'Drywall & Paint: patch holes, texture match, prime/paint walls & trim',
+          'Light Plumbing: faucets, traps, supply lines, toilets (fill/flush valves, wax rings), disposals, caulking',
+          'Light Electrical: fixtures, fans, switches, dimmers, outlets/GFCI, doorbells (low‑voltage)',
+          'Carpentry: baseboards/trim, shelving, closet systems, cabinet hardware, minor framing repairs',
+          'Flooring (small scope): tile pop‑outs & grout repair, LVP/laminate board swaps',
+          'Mount/Install: TVs (wire‑conceal add‑on), blinds, curtain rods, mirrors, pictures',
+          'Assembly: furniture, storage racks, prefab units',
+          'Window cleaning (interior/exterior; screens & sills)',
+          'Basic pest control (ants/roaches; wasp nest removal where safe — no termites)'
+        ]
+      },
+      {
+        key: 'lawn',
+        title: 'Lawn & Outdoor',
+        hero: IMG.lawn,
+        list: [
+          'Trimming/weed‑eating & edging; hedge/bush shaping',
+          'Flowerbeds: design/build, edging, soil amending, mulch install',
+          'Planters & Raised Beds: build/install, fill soil mix, placement',
+          'Garden prep: bed turning, compost/topsoil mix, basic drip/soaker setup',
+          'Cleanup: leaf/brush cleanup (light), haul‑off',
+          'Gutter cleaning (single story)',
+          'Power washing: siding, decks, patios, driveways',
+          'Holiday lights: hanging/removal'
+        ]
+      },
+      {
+        key: 'mechanic',
+        title: 'Mobile Mechanic (Basic to Light Service)',
+        hero: IMG.mechanic,
+        list: [
+          'Battery swap / jump start',
+          'Flat repair / air (where safe), spare changeover',
+          'Wiper & bulb replacement, fluid top‑offs, OBD‑II code read',
+          'Brake jobs (pads / rotors, inspection)',
+          'Oil changes (standard or synthetic; includes filter)',
+          'Spark plug replacement',
+          'Tune‑ups (filters, plugs, belts, fluids)',
+          'Stereo/radio installs & subwoofer wiring'
+        ]
+      },
+      {
+        key: 'builds',
+        title: 'Builds & Construction',
+        hero: IMG.builds,
+        list: [
+          'Porches & small decks — new builds, resurfacing, railings, stairs, skirting, lattice',
+          'Patios (pavers/stone) — base prep, compaction, edging, polymeric sand finish',
+          'Walkways (gravel/paver/stepping stone) — layout, base, edging',
+          'Fencing & gates — wood repairs, small new runs, custom gates, hardware',
+          'Sheds & pergolas — small shed builds, prefab assembly, pergolas/awnings',
+          'Exterior carpentry — fascia/soffit patches, door/sill replacement, trim',
+          'Small interior upgrades — vanity swaps, backsplash installs, accent walls, wainscoting',
+          'Tile & bathroom remodels — surrounds, grout & waterproofing, small bath refreshes',
+          'Concrete (minor) — step patches, small pads/leveling'
+        ]
+      },
+      {
+        key: 'membership',
+        title: 'Membership Plans',
+        hero: IMG.logo,
+        list: [
+          'Gopher Basic — $99/mo • 3 hours • 10% off extra ($36/hr) • 48‑hr priority • roll over 2 months',
+          'Gopher Plus — $199/mo • 6 hours • 15% off extra ($34/hr) • same‑week priority • quarterly perk • roll over 3 months',
+          'Gopher Gold — $349/mo • 10 hours • 20% off extra ($32/hr) • guaranteed slot • free emergency or mobile mechanic service / mo • free travel up to 25mi',
+          'Materials billed separately (+25% when Gopher’s supplies). Cancel anytime.'
+        ]
+      },
+      {
+        key: 'oldproj',
+        title: 'Project Gallery',
+        hero: IMG.joblog,
+        list: ['Prior Projects']
+      }
+    ];
 
-  let gopherChatLastFocus = null;
-  const pad = 12;
-  const defaultBottomBarId = 'bottomCTA';
+    // =========================
+    // BASIC PAGE RENDERING
+    // =========================
+    let active = 'general';
+    const $ = s => document.querySelector(s);
+    const $$ = s => document.querySelectorAll(s);
 
-  function getBottomBarHeight() {
-    const bar = document.getElementById(defaultBottomBarId);
-    if (!bar) return 0;
-    const rect = bar.getBoundingClientRect();
-    return rect.height || bar.offsetHeight || 0;
-  }
+    function renderTabs() {
+      const bar = $('#tabBar');
+      bar.innerHTML = SERVICES.map(service => `
+        <button class="tab ${active === service.key ? 'active' : 'inactive'}" data-tab="${service.key}">${service.title}</button>
+      `).join('');
 
-  function updateFooterOffsetVar() {
-    document.documentElement.style.setProperty('--gopher-footer-offset', `${getBottomBarHeight()}px`);
-  }
-
-  function setWidgetPosition(right, bottom) {
-    gopherChatLauncher.style.right = `${right}px`;
-    gopherChatLauncher.style.bottom = `${bottom}px`;
-    gopherChatPanel.style.right = `${right}px`;
-    gopherChatPanel.style.bottom = `${bottom + 76}px`;
-    gopherChatPanel.style.left = 'auto';
-  }
-
-  function positionAboveBottomBar() {
-    updateFooterOffsetVar();
-    const barHeight = getBottomBarHeight();
-    setWidgetPosition(20, Math.max(pad, barHeight + pad));
-  }
-
-  function gopherChatSetOpen(isOpen) {
-    gopherChatPanel.dataset.open = String(isOpen);
-    gopherChatLauncher.setAttribute('aria-expanded', String(isOpen));
-
-    if (isOpen) {
-      gopherChatLastFocus = document.activeElement;
-    } else if (gopherChatLastFocus) {
-      gopherChatLastFocus.focus();
+      $$('#tabBar .tab').forEach(btn => {
+        btn.onclick = () => {
+          active = btn.dataset.tab;
+          renderSection();
+          renderTabs();
+        };
+      });
     }
-  }
 
-  function gopherChatAppendMessage(text, who = 'bot') {
-    const row = document.createElement('div');
-    row.className = `chat-row ${who}`;
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    bubble.textContent = text;
-    row.appendChild(bubble);
-    gopherChatLog.appendChild(row);
-    gopherChatLog.scrollTop = gopherChatLog.scrollHeight;
-  }
+    function renderSection() {
+      const sec = $('#sectionArea');
+      const group = SERVICES.find(s => s.key === active);
 
-  gopherChatInput.addEventListener('focus', () => {
-    gopherChatInput.removeAttribute('readonly');
-  });
+      if (active === 'oldproj') {
+        sec.innerHTML = `
+          <div class="flex flex-col space-y-6">
+            <div class="card overflow-hidden">
+              <div class="w-full h-64 sm:h-80 bg-amber-50 flex items-center justify-center">
+                <img src="${group.hero}" alt="${group.title}" class="max-h-full w-auto object-contain fade-in" onload="this.classList.add('show')">
+              </div>
 
-  gopherChatLauncher.addEventListener('click', () => {
-    gopherChatSetOpen(gopherChatPanel.dataset.open !== 'true');
-  });
+              <div class="p-4 sm:p-6 space-y-6">
+                <div class="card p-4 sm:p-6 border border-stone-200">
+                  <div class="bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-lg mb-4">LVP, Countertops, and Paint</div>
+                  <div class="grid grid-cols-2 gap-4 mb-4 text-center">
+                    <div class="font-bold text-stone-700">Before</div>
+                    <div class="font-bold text-stone-700">After</div>
+                  </div>
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clarklvpb4.jpg" alt="Before: LVP, countertops, and paint project" class="w-full h-full object-cover"></div>
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clark-lvp.webp" alt="After: LVP, countertops, and paint project" class="w-full h-full object-cover"></div>
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="ClarkKitb4.jpg" alt="Before: LVP, countertops, and paint project" class="w-full h-full object-cover"></div>
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clark_kit.webp" alt="After: LVP, countertops, and paint project" class="w-full h-full object-cover"></div>
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="ClarkdiningB4.jpg" alt="Before: LVP, countertops, and paint project" class="w-full h-full object-cover"></div>
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clark_dining.webp" alt="After: LVP, countertops, and paint project" class="w-full h-full object-cover"></div>
+                  </div>
+                </div>
 
-  gopherChatClose.addEventListener('click', () => gopherChatSetOpen(false));
+                <div class="card p-4 sm:p-6 border border-stone-200">
+                  <div class="bg-amber-400 text-stone-900 text-sm font-semibold px-4 py-2 rounded-lg mb-4">Bathroom Remodel</div>
+                  <div class="grid grid-cols-2 gap-4 mb-4 text-center">
+                    <div class="font-bold text-stone-700">Before</div>
+                    <div class="font-bold text-stone-700">After</div>
+                  </div>
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="bathroombef1.jpg" alt="Before: bathroom remodel" class="w-full h-full object-cover"></div>
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="bathroomaft1.webp" alt="After: bathroom remodel" class="w-full h-full object-cover"></div>
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="bathroombef2.jpg" alt="Before: bathroom remodel" class="w-full h-full object-cover"></div>
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="bathroomaft2.webp" alt="After: bathroom remodel" class="w-full h-full object-cover"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        return;
+      }
 
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && gopherChatPanel.dataset.open === 'true') {
-      gopherChatSetOpen(false);
+      sec.innerHTML = `
+        <div class="card overflow-hidden">
+          <div class="w-full h-64 sm:h-80 bg-amber-50 flex items-center justify-center">
+            <img src="${group.hero}" alt="${group.title}" class="max-h-full w-auto object-contain fade-in" onload="this.classList.add('show')">
+          </div>
+          <div class="p-4 sm:p-6">
+            <h2 class="text-2xl font-extrabold mb-2">${group.title}</h2>
+            <ul class="list-disc pl-5 space-y-1">
+              ${group.list.map(item => `<li>${item}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+      `;
     }
-  });
 
-  const CHATBOT_API_URL = 'PASTE-YOUR-CHATBOT-ENDPOINT-HERE';
+    document.getElementById('logoImg').src = IMG.logo;
+    document.getElementById('yr').innerText = new Date().getFullYear();
+    renderTabs();
+    renderSection();
 
-  async function gopherChatGetReply(message) {
-    if (CHATBOT_API_URL === 'PASTE-YOUR-CHATBOT-ENDPOINT-HERE') {
-      return 'Sample mode: the widget is installed correctly.';
+    // =========================
+    // CHAT WIDGET
+    // =========================
+    const chatLauncher = document.getElementById('chatLauncher');
+    const chatPanel = document.getElementById('chatPanel');
+    const chatClose = document.getElementById('chatClose');
+    const chatForm = document.getElementById('chatForm');
+    const chatInput = document.getElementById('chatInput');
+    const chatLog = document.getElementById('chatLog');
+    let lastFocus = null;
+    const bottomBarId = 'bottomCTA';
+    const gap = 12;
+
+    function getBottomBarHeight() {
+      const bar = document.getElementById(bottomBarId);
+      if (!bar) return 0;
+      const rect = bar.getBoundingClientRect();
+      return rect.height || bar.offsetHeight || 0;
     }
 
-    const response = await fetch(CHATBOT_API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message })
+    function updateFooterOffset() {
+      document.documentElement.style.setProperty('--gopher-footer-offset', `${getBottomBarHeight()}px`);
+    }
+
+    function setWidgetPosition(right, bottom) {
+      chatLauncher.style.right = `${right}px`;
+      chatLauncher.style.bottom = `${bottom}px`;
+      chatPanel.style.right = `${right}px`;
+      chatPanel.style.bottom = `${bottom + 76}px`;
+      chatPanel.style.left = 'auto';
+    }
+
+    function positionAboveBottomBar() {
+      updateFooterOffset();
+      const barHeight = getBottomBarHeight();
+      setWidgetPosition(20, Math.max(gap, barHeight + gap));
+    }
+
+    function setOpen(isOpen) {
+      chatPanel.dataset.open = String(isOpen);
+      chatLauncher.setAttribute('aria-expanded', String(isOpen));
+      if (isOpen) {
+        lastFocus = document.activeElement;
+      } else if (lastFocus) {
+        lastFocus.focus();
+      }
+    }
+
+    function appendMessage(text, who = 'bot') {
+      const row = document.createElement('div');
+      row.className = `chat-row ${who}`;
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = text;
+      row.appendChild(bubble);
+      chatLog.appendChild(row);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    chatInput.addEventListener('focus', () => {
+      chatInput.removeAttribute('readonly');
     });
 
-    if (!response.ok) throw new Error('Chatbot request failed.');
+    chatLauncher.addEventListener('click', () => {
+      setOpen(chatPanel.dataset.open !== 'true');
+    });
 
-    const data = await response.json();
-    return data.reply || 'Sorry, I could not generate a reply just now.';
-  }
+    chatClose.addEventListener('click', () => setOpen(false));
 
-  positionAboveBottomBar();
-  window.addEventListener('resize', positionAboveBottomBar);
-  window.addEventListener('load', positionAboveBottomBar);
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && chatPanel.dataset.open === 'true') {
+        setOpen(false);
+      }
+    });
 
-  gopherChatLog.addEventListener('submit', () => {});
+    const CHATBOT_API_URL = 'PASTE-YOUR-CHATBOT-ENDPOINT-HERE';
+
+    async function getReply(message) {
+      if (CHATBOT_API_URL === 'PASTE-YOUR-CHATBOT-ENDPOINT-HERE') {
+        return 'Sample mode: the widget is installed correctly. Paste your chatbot API endpoint into CHATBOT_API_URL.';
+      }
+
+      const response = await fetch(CHATBOT_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+      });
+
+      if (!response.ok) {
+        throw new Error('Chatbot request failed.');
+      }
+
+      const data = await response.json();
+      return data.reply || 'Sorry, I could not generate a reply just now.';
+    }
+
+    positionAboveBottomBar();
+    window.addEventListener('resize', positionAboveBottomBar);
+    window.addEventListener('load', positionAboveBottomBar);
+
+    chatForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      const message = chatInput.value.trim();
+      if (!message) return;
+
+      appendMessage(message, 'user');
+      chatInput.value = '';
+
+      try {
+        const reply = await getReply(message);
+        appendMessage(reply, 'bot');
+      } catch (error) {
+        appendMessage('Sorry — the chat service is temporarily unavailable. Please try again or text Gopher directly.', 'bot');
+        console.error(error);
+      }
+    });
   </script>
 </body>
 </html>
