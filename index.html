@@ -51,7 +51,7 @@ PUT THESE INSIDE <head>
   .chat-launcher {
     position: fixed;
     right: 20px;
-    bottom: 92px;
+    bottom: 128px;
     width: 64px;
     height: 64px;
     border: 0;
@@ -529,8 +529,7 @@ PUT THESE JUST ABOVE </body>
         loading="lazy"
       >
       <div>
-        <h2 class="chat-title">Gopher estimate chat</h2>
-        <p class="chat-subtitle">Tell us the job type, rough square footage, and a few details, and Gopher can start a fast ballpark estimate.</p>
+        <h2 class="chat-title">Gopher's Estimate Bot</h2>
       </div>
     </div>
     <button class="chat-close" id="chatClose" aria-label="Close chat">✕</button>
@@ -538,14 +537,14 @@ PUT THESE JUST ABOVE </body>
 
   <div class="chat-body" id="chatLog" role="log" aria-live="polite" aria-relevant="additions text">
     <div class="chat-row bot">
-      <div class="bubble">Hey there — welcome to Gopher’s. I can help start a quick estimate. What kind of job do you need done, and about how big is it?</div>
+      <div class="bubble">Hey there! Thanks for choosing Gopher’s! Tell us a little more about your job and we'll give you an estimate!</div>
     </div>
   </div>
 
   <footer class="chat-footer">
-    <p class="chat-note">By sending a message, the visitor agrees to be contacted about the quote. Replies can route into text-message follow-up.</p>
+    <p class="chat-note">By sending a message, you agree to be contacted about your quote.</p>
     <form class="chat-form" id="chatForm">
-      <label class="sr-only" for="chatInput">Type your message</label>
+      <label class="sr-only" for="chatInput">How can we help ya?</label>
       <textarea id="chatInput" class="chat-input" rows="1" placeholder="Example: pressure washing, 1,800 sq ft"></textarea>
       <button class="chat-send" type="submit" aria-label="Send message">Send</button>
     </form>
