@@ -550,43 +550,130 @@ PUT THESE JUST ABOVE </body>
 </section>
 
 <script>
-  const launcher = document.getElementById('chatLauncher');
-  const panel = document.getElementById('chatPanel');
-  const closeBtn = document.getElementById('chatClose');
-  const form = document.getElementById('chatForm');
-  const input = document.getElementById('chatInput');
-  const log = document.getElementById('chatLog');
-  let lastFocus = null;
+  const gopherChatLauncher = document.getElementById('gopherChatLauncher');
+  const gopherChatPanel = document.getElementById('gopherChatPanel');
+  const gopherChatClose = document.getElementById('gopherChatClose');
+  const gopherChatForm = document.getElementById('gopherChatForm');
+  const gopherChatInput = document.getElementById('gopherChatInput');
+  const gopherChatLog = document.getElementById('gopherChatLog');
+  let gopherChatLastFocus = null;
+  let dragState = null;
+  const pad = 12;
+  const defaultBottomBarId = 'bottomCTA';
 
-  function setOpen(isOpen) {
-    panel.dataset.open = String(isOpen);
-    launcher.setAttribute('aria-expanded', String(isOpen));
+  function getBottomBarHeight() {
+    const bar = document.getElementById(defaultBottomBarId);
+    if (!bar) return 0;
+    const rect = bar.getBoundingClientRect();
+    return rect.height || bar.offsetHeight || 0;
+  }
+
+  function updateFooterOffsetVar() {
+    const barHeight = getBottomBarHeight();
+    document.documentElement.style.setProperty('--gopher-footer-offset', `${barHeight}px`);
+  }
+
+  function setWidgetPosition(right, bottom) {
+    gopherChatLauncher.style.right = `${right}px`;
+    gopherChatLauncher.style.bottom = `${bottom}px`;
+    gopherChatPanel.style.right = `${right}px`;
+    gopherChatPanel.style.bottom = `${bottom + 76}px`;
+    gopherChatPanel.style.left = 'auto';
+  }
+
+  function positionAboveBottomBar() {
+    updateFooterOffsetVar();
+    const barHeight = getBottomBarHeight();
+    setWidgetPosition(20, Math.max(pad, barHeight + pad));
+  }
+
+  function snapToEdge() {
+    const rect = gopherChatLauncher.getBoundingClientRect();
+    const rightDist = window.innerWidth - rect.right;
+    const leftDist = rect.left;
+    const targetRight = rightDist <= leftDist ? Math.max(pad, rightDist) : Math.max(pad, window.innerWidth - rect.left - rect.width);
+    const barHeight = getBottomBarHeight();
+    const targetBottom = Math.max(pad, window.innerHeight - rect.bottom, barHeight + pad);
+    setWidgetPosition(targetRight, targetBottom);
+  }
+
+  function startDrag(e) {
+    if (e.type === 'mousedown' && e.button !== 0) return;
+    const point = e.touches ? e.touches[0] : e;
+    const rect = gopherChatLauncher.getBoundingClientRect();
+    dragState = {
+      startX: point.clientX,
+      startY: point.clientY,
+      startRight: window.innerWidth - rect.right,
+      startBottom: window.innerHeight - rect.bottom,
+      moved: false
+    };
+    document.addEventListener('mousemove', onDragMove);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragMove, { passive: false });
+    document.addEventListener('touchend', endDrag);
+    if (e.cancelable) e.preventDefault();
+  }
+
+  function onDragMove(e) {
+    if (!dragState) return;
+    const point = e.touches ? e.touches[0] : e;
+    const dx = point.clientX - dragState.startX;
+    const dy = point.clientY - dragState.startY;
+    if (Math.abs(dx) + Math.abs(dy) > 4) dragState.moved = true;
+    const nextRight = Math.max(12, dragState.startRight - dx);
+    const nextBottom = Math.max(12, dragState.startBottom - dy);
+    setWidgetPosition(nextRight, nextBottom);
+    if (e.cancelable) e.preventDefault();
+  }
+
+  function endDrag() {
+    document.removeEventListener('mousemove', onDragMove);
+    document.removeEventListener('mouseup', endDrag);
+    document.removeEventListener('touchmove', onDragMove);
+    document.removeEventListener('touchend', endDrag);
+    if (dragState?.moved) snapToEdge();
+    dragState = null;
+  }
+
+  function gopherChatSetOpen(isOpen) {
+    gopherChatPanel.dataset.open = String(isOpen);
+    gopherChatLauncher.setAttribute('aria-expanded', String(isOpen));
     if (isOpen) {
-      lastFocus = document.activeElement;
-      input.focus();
-    } else if (lastFocus) {
-      lastFocus.focus();
+      gopherChatLastFocus = document.activeElement;
+      gopherChatInput.focus();
+    } else if (gopherChatLastFocus) {
+      gopherChatLastFocus.focus();
     }
   }
 
-  function appendMessage(text, who = 'bot') {
+  function gopherChatAppendMessage(text, who = 'bot') {
     const row = document.createElement('div');
-    row.className = `chat-row ${who}`;
-
+    row.className = `gopher-chat-row ${who}`;
     const bubble = document.createElement('div');
-    bubble.className = 'bubble';
+    bubble.className = 'gopher-chat-bubble';
     bubble.textContent = text;
-
     row.appendChild(bubble);
-    log.appendChild(row);
-    log.scrollTop = log.scrollHeight;
+    gopherChatLog.appendChild(row);
+    gopherChatLog.scrollTop = gopherChatLog.scrollHeight;
   }
 
-  launcher.addEventListener('click', () => setOpen(panel.dataset.open !== 'true'));
-  closeBtn.addEventListener('click', () => setOpen(false));
+  gopherChatLauncher.addEventListener('mousedown', startDrag);
+  gopherChatLauncher.addEventListener('touchstart', startDrag, { passive: false });
+  gopherChatLauncher.addEventListener('click', (event) => {
+    if (dragState?.moved) {
+      event.preventDefault();
+      return;
+    }
+    gopherChatSetOpen(gopherChatPanel.dataset.open !== 'true');
+  });
+
+  gopherChatClose.addEventListener('click', () => gopherChatSetOpen(false));
 
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && panel.dataset.open === 'true') setOpen(false);
+    if (event.key === 'Escape' && gopherChatPanel.dataset.open === 'true') {
+      gopherChatSetOpen(false);
+    }
   });
 
   /*
@@ -594,32 +681,22 @@ PUT THESE JUST ABOVE </body>
     WHERE TO CONNECT YOUR REAL CHATBOT / API
     ============================================================
 
-    OPTION 1: YOUR OWN API ENDPOINT
-    Replace CHATBOT_API_URL with your real backend URL.
-    Your backend should accept JSON like: { message: "..." }
-    and return JSON like: { reply: "..." }
-
-    OPTION 2: THIRD-PARTY CHATBOT PROVIDER
-    If you use a chatbot company, remove the fetch() block below
-    and paste their script or SDK where they tell you.
-
-    OPTION 3: ESTIMATE BOT + TEXT ALERTS
-    Your backend can also save the lead, run pricing rules,
-    and text you or the customer after this message is sent.
+    Replace CHATBOT_API_URL with your real backend endpoint later.
+    Example request body sent from this widget: { message: "Hello" }
+    Example response expected from your backend: { reply: "Hi there" }
   */
   const CHATBOT_API_URL = 'PASTE-YOUR-CHATBOT-ENDPOINT-HERE';
 
-  async function getBotReply(message) {
+  async function gopherChatGetReply(message) {
     /*
       ============================================================
       MAIN LOGIC AREA
       ============================================================
-      THIS is the section you will edit later when your bot is ready.
-      For now, it safely returns a sample message.
+      This is the exact section to change when your bot is ready.
+      Until then, the widget stays in sample mode.
     */
-
     if (CHATBOT_API_URL === 'PASTE-YOUR-CHATBOT-ENDPOINT-HERE') {
-      return 'Sample mode: your widget is working. When your chatbot API is ready, paste the endpoint URL into CHATBOT_API_URL and replace this sample response logic if needed.';
+      return 'Sample mode: the widget is installed correctly. When your chatbot API is ready, paste the endpoint URL into CHATBOT_API_URL.';
     }
 
     const response = await fetch(CHATBOT_API_URL, {
@@ -636,47 +713,26 @@ PUT THESE JUST ABOVE </body>
     return data.reply || 'Sorry, I could not generate a reply just now.';
   }
 
-  form.addEventListener('submit', async (event) => {
+  positionAboveBottomBar();
+  window.addEventListener('resize', positionAboveBottomBar);
+  window.addEventListener('load', positionAboveBottomBar);
+
+  gopherChatForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const message = input.value.trim();
+    const message = gopherChatInput.value.trim();
     if (!message) return;
 
-    appendMessage(message, 'user');
-    input.value = '';
+    gopherChatAppendMessage(message, 'user');
+    gopherChatInput.value = '';
 
     try {
-      const botReply = await getBotReply(message);
-      appendMessage(botReply, 'bot');
+      const reply = await gopherChatGetReply(message);
+      gopherChatAppendMessage(reply, 'bot');
     } catch (error) {
-      appendMessage('Sorry — the chat service is temporarily unavailable. Please try again or text Gopher directly.', 'bot');
+      gopherChatAppendMessage('Sorry — the chat service is temporarily unavailable. Please try again or text Gopher directly.', 'bot');
       console.error(error);
     }
   });
-
-
-  function getBottomBarHeight() {
-    const bar = document.getElementById('bottomCTA'); // change this ID if needed
-    if (!bar) return 0;
-    const rect = bar.getBoundingClientRect();
-    return rect.height || bar.offsetHeight || 0;
-  }
-
-  function positionChatAboveBar() {
-    const barHeight = getBottomBarHeight();
-    const gap = 12;
-
-    const launcher = document.getElementById('gopherChatLauncher');
-    const panel = document.getElementById('gopherChatPanel');
-
-    launcher.style.right = '20px';
-    launcher.style.bottom = `${barHeight + gap}px`;
-
-    panel.style.right = '20px';
-    panel.style.bottom = `${barHeight + gap + 76}px`;
-  }
-
-  window.addEventListener('load', positionChatAboveBar);
-  window.addEventListener('resize', positionChatAboveBar);
 </script>
   
 
