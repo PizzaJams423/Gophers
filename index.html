@@ -258,7 +258,7 @@ PUT THESE INSIDE <head>
   
 <body class="text-stone-900">
   <!-- Sticky mobile CTA -->
-  <div class="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-white/95 backdrop-blur border-t border-stone-200 shadow-[0_-2px_10px_rgba(0,0,0,0.08)]">
+  <div id="bottomCTA" class="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-white/95 backdrop-blur border-t border-stone-200 shadow-[0_-2px_10px_rgba(0,0,0,0.08)]">
     <div class="grid grid-cols-2 gap-2 p-3">
       <a
         href="tel:+14238882856"
@@ -654,7 +654,34 @@ PUT THESE JUST ABOVE </body>
       console.error(error);
     }
   });
+
+
+  function getBottomBarHeight() {
+    const bar = document.getElementById('bottomCTA'); // change this ID if needed
+    if (!bar) return 0;
+    const rect = bar.getBoundingClientRect();
+    return rect.height || bar.offsetHeight || 0;
+  }
+
+  function positionChatAboveBar() {
+    const barHeight = getBottomBarHeight();
+    const gap = 12;
+
+    const launcher = document.getElementById('gopherChatLauncher');
+    const panel = document.getElementById('gopherChatPanel');
+
+    launcher.style.right = '20px';
+    launcher.style.bottom = `${barHeight + gap}px`;
+
+    panel.style.right = '20px';
+    panel.style.bottom = `${barHeight + gap + 76}px`;
+  }
+
+  window.addEventListener('load', positionChatAboveBar);
+  window.addEventListener('resize', positionChatAboveBar);
 </script>
+  
+
 
 
   
