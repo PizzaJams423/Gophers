@@ -53,6 +53,26 @@
       box-shadow: 0 1px 4px rgba(0, 0, 0, .08);
     }
 
+  .chat-row.bot {
+    align-items: flex-start;
+  }
+
+  .bot-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    object-fit: cover;
+    flex: 0 0 auto;
+    margin-right: 10px;
+    margin-top: 2px;
+  }
+
+  .bot-message-wrap {
+    display: flex;
+    align-items: flex-start;
+  }
+
+    
     .chat-launcher,
     .chat-panel,
     .chat-panel * {
@@ -593,6 +613,29 @@
       chatLog.appendChild(row);
       chatLog.scrollTop = chatLog.scrollHeight;
     }
+  function appendBotMessage(text) {
+    const row = document.createElement('div');
+    row.className = 'chat-row bot';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'bot-message-wrap';
+
+    const avatar = document.createElement('img');
+    avatar.className = 'bot-avatar';
+    avatar.src = 'image-8.png';
+    avatar.alt = 'Gopher avatar';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = text;
+
+    wrap.appendChild(avatar);
+    wrap.appendChild(bubble);
+    row.appendChild(wrap);
+    chatLog.appendChild(row);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
 
     chatInput.addEventListener('focus', () => {
       chatInput.removeAttribute('readonly');
