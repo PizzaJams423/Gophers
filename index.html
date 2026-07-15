@@ -395,6 +395,7 @@
       }
       return data;
     }
+    
 function formatReply(data) {
   if (!data) return 'Sorry - I could not get a response.';
   if (typeof data === 'string') return data;
@@ -417,17 +418,19 @@ function formatReply(data) {
     msg += ` Labor: $${Number(e.labor ?? 0).toFixed(2)}.`;
     msg += ` Add-ons: $${Number(e.addons ?? 0).toFixed(2)}.`;
     msg += ` Final estimate: $${Number(e.final_estimate ?? 0).toFixed(2)}.`;
-    if (e.notes && e.notes.length) msg += `
+   
+    if (e.notes && e.notes.length) {
+  msg += `
 Notes:
 - ${e.notes.join('
 - ')}`;
+                 }`     
     if (data.sheets_logged !== undefined) msg += `
 Sheets logged: ${data.sheets_logged ? 'yes' : 'no'}.`;
     if (data.sheets_error) msg += `
 Sheets error: ${data.sheets_error}.`;
     return msg;
   }
-
   return JSON.stringify(data, null, 2);
 }
     
@@ -451,7 +454,7 @@ Sheets error: ${data.sheets_error}.`;
         removeTyping();
         appendBotMessage('Sorry â€” the chat service is temporarily unavailable. Please try again.');
         console.error(err);
-      }
+      }`
     });
     
   </script>
