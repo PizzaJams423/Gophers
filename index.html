@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gopher's Handyman Service</title>
+  <title>Gopher’s Handyman Service</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -57,9 +57,7 @@
       flex-direction: column;
       z-index: var(--chat-z);
     }
-    .chat-panel.open {
-      display: flex;
-    }
+    .chat-panel[data-open="true"] { display: flex; }
     .chat-header {
       background: linear-gradient(135deg, #b45309, #f59e0b);
       color: #fff;
@@ -99,17 +97,10 @@
       padding: 16px;
       background: linear-gradient(180deg, #fffdf8 0%, #fff7ed 100%);
     }
-    .chat-row {
-      display: flex;
-      margin-bottom: 12px;
-    }
+    .chat-row { display: flex; margin-bottom: 12px; }
     .chat-row.bot { justify-content: flex-start; }
     .chat-row.user { justify-content: flex-end; }
-    .bot-message-wrap {
-      display: flex;
-      align-items: flex-start;
-      max-width: 84%;
-    }
+    .bot-message-wrap { display: flex; align-items: flex-start; max-width: 84%; }
     .bot-avatar {
       width: 34px;
       height: 34px;
@@ -144,17 +135,8 @@
       background: #fff;
       flex: 0 0 auto;
     }
-    .chat-note {
-      font-size: .76rem;
-      color: #57534e;
-      margin: 0 0 10px;
-    }
-    .chat-form {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      align-items: end;
-    }
+    .chat-note { font-size: .76rem; color: #57534e; margin: 0 0 10px; }
+    .chat-form { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; }
     .chat-input {
       width: 100%;
       min-height: 48px;
@@ -196,17 +178,10 @@
         width: 60px;
         height: 60px;
       }
-      .chat-panel {
-        inset: 0;
-        width: 100vw;
-        height: 100vh;
-      }
+      .chat-panel { inset: 0; width: 100vw; height: 100vh; }
     }
     @media (prefers-reduced-motion: reduce) {
-      .chat-launcher, .chat-panel, .chat-panel * {
-        transition: none !important;
-        scroll-behavior: auto;
-      }
+      .chat-launcher, .chat-panel, .chat-panel * { transition: none !important; scroll-behavior: auto; }
     }
   </style>
 </head>
@@ -214,14 +189,14 @@
   <div id="bottomCTA" class="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-white/95 backdrop-blur border-t border-stone-200 shadow-[0_-2px_10px_rgba(0,0,0,0.08)]">
     <div class="grid grid-cols-2 gap-2 p-3">
       <a href="tel:+14238882856" class="flex items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-white font-semibold shadow active:scale-[0.99]" aria-label="Call Gopher at 423-888-2856">Call</a>
-      <a href="sms:+14238882856?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate." class="flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-white font-semibold shadow active:scale-[0.99]" aria-label="Text Gopher">Text</a>
+      <a href="sms:+14238882856?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate." class="flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-white font-semibold shadow active:scale-[0.99]" aria-label="Text Gopher for an estimate">Text</a>
     </div>
   </div>
 
   <header class="sticky top-0 z-40 bg-amber-100/80 backdrop-blur border-b border-amber-200">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
       <img id="logoImg" class="h-10 w-auto rounded" alt="Gopher's logo">
-      <div class="font-extrabold text-xl">Gopher's Handyman Service</div>
+      <div class="font-extrabold text-xl">Gopher’s Handyman Service</div>
       <div class="ml-auto text-sm text-stone-600 hidden sm:block">Chattanooga + 15 mi • Text/Call: (423) 888-2856</div>
     </div>
   </header>
@@ -235,28 +210,23 @@
         <img src="file_0000000033c061f58a296450d1d6f625.png" alt="Virtual Estimates Coming Soon!" class="max-h-40 sm:max-h-48 w-auto fade-in" onload="this.classList.add('show')">
       </div>
       <div class="flex flex-wrap gap-2 justify-end">
-        <a id="smsLink" href="sms:+14238882856?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate." class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow">Text Estimate</a>
+        <a id="smsLink" href="sms:+14238882856?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate." class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow">Text Gopher</a>
         <a id="callLink" href="tel:+14238882856" class="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow">Call Gopher</a>
       </div>
     </div>
   </section>
 
-  <footer class="text-center text-sm text-stone-600 py-8">© <span id="yr"></span> Gopher's Handyman Service — Chattanooga, TN</footer>
+  <footer class="text-center text-sm text-stone-600 py-8">© <span id="yr"></span> Gopher’s Handyman Service — Chattanooga, TN</footer>
 
   <button class="chat-launcher" id="chatLauncher" aria-controls="chatPanel" aria-expanded="false" aria-label="Open chat">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M8 10h8M8 14h5m-7 6 1.6-3.2A8 8 0 1 1 20 12a8 8 0 0 1-8 8H6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 10h8M8 14h5m-7 6 1.6-3.2A8 8 0 1 1 20 12a8 8 0 0 1-8 8H6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
 
   <section class="chat-panel" id="chatPanel" aria-label="Website chat" data-open="false">
     <header class="chat-header">
       <div style="display:flex;align-items:center;gap:12px;">
-        <img src="image-38.png" alt="Gopher avatar" width="44" height="44" style="width:44px;height:44px;border-radius:999px;object-fit:cover;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.22);">
-        <div>
-          <h2 class="chat-title">Gopher's Estimate Bot</h2>
-          <p class="chat-subtitle">Ask for a quick estimate.</p>
-        </div>
+        <img src="image-38.png" alt="Gopher avatar" width="44" height="44" style="width:44px;height:44px;border-radius:999px;object-fit:cover;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);box-shadow:0 3px 10px rgba(0,0,0,.12);" loading="lazy">
+        <div><h2 class="chat-title">Gopher's Estimate Bot</h2><p class="chat-subtitle">Ask for a quick estimate.</p></div>
       </div>
       <button class="chat-close" id="chatClose" aria-label="Close chat">✕</button>
     </header>
@@ -265,7 +235,7 @@
       <div class="chat-row bot">
         <div class="bot-message-wrap">
           <img class="bot-avatar" src="image-28.png" alt="Gopher avatar">
-          <div class="bubble">Hey there! Thanks for choosing Gopher's! Tell us a little more about your job and we'll give you an estimate!</div>
+          <div class="bubble">Hey there! Thanks for choosing Gopher’s! Tell us a little more about your job and we'll give you an estimate!</div>
         </div>
       </div>
     </div>
@@ -274,199 +244,44 @@
       <p class="chat-note">By sending a message, you agree to be contacted about your quote.</p>
       <form class="chat-form" id="chatForm">
         <label class="sr-only" for="chatInput">How can we help ya?</label>
-        <textarea id="chatInput" class="chat-input" rows="1" placeholder="Example: pressure washing, 1,800 sq ft"></textarea>
+        <textarea id="chatInput" class="chat-input" rows="1" placeholder="Example: pressure washing, 1,800 sq ft" readonly></textarea>
         <button class="chat-send" type="submit" aria-label="Send message">Send</button>
       </form>
     </footer>
   </section>
 
   <script>
-
-    const chatLauncher = document.getElementById('chatLauncher');
-    const chatPanel = document.getElementById('chatPanel');
-    const chatClose = document.getElementById('chatClose');
-    const chatForm = document.getElementById('chatForm');
-    const chatInput = document.getElementById('chatInput');
-    const chatLog = document.getElementById('chatLog');
-    const API_BASE = 'https://gbot-vs3h.onrender.com';
-    const SESSION_KEY = 'gopherbot_session_id';
-
-    function getSessionId() {
-      let id = localStorage.getItem(SESSION_KEY);
-      if (!id) {
-        id = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
-        localStorage.setItem(SESSION_KEY, id);
-      }
-      return id;
-    }
-
-    function setOpen(isOpen) {
-      chatPanel.dataset.open = String(isOpen);
-      chatLauncher.setAttribute('aria-expanded', String(isOpen));
-      chatPanel.classList.toggle('open', isOpen);
-      chatLauncher.classList.toggle('hidden', isOpen);
-      document.body.style.overflow = isOpen ? 'hidden' : '';
-      if (isOpen) setTimeout(() => chatInput.focus(), 50);
-    }
-
-    function appendUserMessage(text) {
-      const row = document.createElement('div');
-      row.className = 'chat-row user';
-      const bubble = document.createElement('div');
-      bubble.className = 'bubble';
-      bubble.textContent = text;
-      row.appendChild(bubble);
-      chatLog.appendChild(row);
-      chatLog.scrollTop = chatLog.scrollHeight;
-    }
-
-    function appendBotMessage(text) {
-      const row = document.createElement('div');
-      row.className = 'chat-row bot';
-      const wrap = document.createElement('div');
-      wrap.className = 'bot-message-wrap';
-      const avatar = document.createElement('img');
-      avatar.src = 'image-28.png';
-      avatar.alt = 'Gopherbot avatar';
-      avatar.className = 'bot-avatar';
-      const bubble = document.createElement('div');
-      bubble.className = 'bubble';
-      bubble.textContent = text;
-      wrap.appendChild(avatar);
-      wrap.appendChild(bubble);
-      row.appendChild(wrap);
-      chatLog.appendChild(row);
-      chatLog.scrollTop = chatLog.scrollHeight;
-    }
-
-    function appendTyping() {
-      if (document.getElementById('typingRow')) return;
-      const row = document.createElement('div');
-      row.className = 'chat-row bot';
-      row.id = 'typingRow';
-      const wrap = document.createElement('div');
-      wrap.className = 'bot-message-wrap';
-      const avatar = document.createElement('img');
-      avatar.src = 'image-28.png';
-      avatar.alt = 'Gopherbot avatar';
-      avatar.className = 'bot-avatar';
-      const bubble = document.createElement('div');
-      bubble.className = 'bubble';
-      bubble.textContent = 'Typing...';
-      wrap.appendChild(avatar);
-      wrap.appendChild(bubble);
-      row.appendChild(wrap);
-      chatLog.appendChild(row);
-      chatLog.scrollTop = chatLog.scrollHeight;
-    }
-
-    function removeTyping() {
-      const el = document.getElementById('typingRow');
-      if (el) el.remove();
-    }
-
-    const FIELD_HINTS = {
-      service: 'Try mentioning the service type, like LVP, painting, tile install, drywall, electrical, or general repair.',
-      quantity: 'Include a size or amount, such as 200 sq ft, 15 linear ft, 3 doors, or 4 units.',
-      hours: 'Add hours for hourly work, like 2 hours or 4.5 hours.',
-      name: 'Tell me the client name.',
-      phone: 'Add a phone number, like 423-555-1234.',
-      email: 'Add an email address, like name@example.com.',
-    };
-
-    function formatErrorMessage(err, responseData, status) {
-      const base = responseData?.detail || responseData?.error || responseData?.message || (typeof responseData === 'string' ? responseData : '') || err?.message || '';
-      const extra = status ? ` (HTTP ${status})` : '';
-      return (base || 'Request failed.') + extra;
-    }
-
-    async function sendToBot(message) {
-      const res = await fetch(`${API_BASE}/api/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json, text/plain, */*'
-        },
-        body: JSON.stringify({ session_id: getSessionId(), text: message })
-      });
-
-      const raw = await res.text();
-      let data = null;
-      try { data = raw ? JSON.parse(raw) : null; } catch { data = raw; }
-      if (!res.ok) {
-        throw new Error(formatErrorMessage(null, data, res.status));
-      }
-      return data;
-    }
-
-    function formatReply(data) {
-      if (!data) return 'Sorry - I could not get a response.';
-      if (typeof data === 'string') return data;
-      if (data.reply) return data.reply;
-      if (data.message) return data.message;
-      if (data.detail) return data.detail;
-      if (data.error) return data.error;
-
-      if (data.status === 'need_more_info') {
-        const fieldList = Array.isArray(data.missing) && data.missing.length ? ` Missing: ${data.missing.join(', ')}.` : '';
-        const hint = data.missing && FIELD_HINTS[data.missing[0]] ? ` ${FIELD_HINTS[data.missing[0]]}` : '';
-        return (data.question || 'I need a little more info.') + fieldList + hint;
-      }
-
-      if (data.status === 'complete' && data.estimate) {
-        const e = data.estimate;
-        let msg = `Estimate ready: $${e.low} to $${e.high}.`;
-        if (e.service_label) msg += ` Service: ${e.service_label}.`;
-        if (typeof e.quantity !== 'undefined' && e.unit) msg += ` Amount: ${e.quantity} ${e.unit}.`;
-        msg += ` Labor: $${Number(e.labor ?? 0).toFixed(2)}.`;
-        msg += ` Add-ons: $${Number(e.addons ?? 0).toFixed(2)}.`;
-        msg += ` Final estimate: $${Number(e.final_estimate ?? 0).toFixed(2)}.`;
-        if (e.notes && e.notes.length) {
-          msg += `\nNotes:\n- ${e.notes.join('\n- ')}`;
-        }
-        if (data.sheets_logged !== undefined) msg += `\nSheets logged: ${data.sheets_logged ? 'yes' : 'no'}.`;
-        if (data.sheets_error) msg += `\nSheets error: ${data.sheets_error}.`;
-        return msg;
-      }
-
-      return JSON.stringify(data, null, 2);
-    }
-
-    // Event listeners
-    chatLauncher.addEventListener('click', () => setOpen(true));
+    const IMG = { logo: 'image-38.png', general: 'file_00000000e0d46230b0cb3139ec953033.png', lawn: 'file_00000000061c62309954b4094aabf893.png', mechanic: 'file_000000003f2c61f79ffc24f1fbb273a2.png', builds: 'file_00000000fd506230a50b8dc7dfefb9da.png', joblog: 'Goodgoph.png' };
+    const SERVICES = [
+      { key:'general', title:'General Maintenance', hero:IMG.general, list:['Doors: hinge/strike adjustments, latch/lock installs, weatherstripping, thresholds','Drywall & Paint: patch holes, texture match, prime/paint walls & trim','Light Plumbing: faucets, traps, supply lines, toilets (fill/flush valves, wax rings), disposals, caulking','Light Electrical: fixtures, fans, switches, dimmers, outlets/GFCI, doorbells (low‑voltage)','Carpentry: baseboards/trim, shelving, closet systems, cabinet hardware, minor framing repairs','Flooring (small scope): tile pop‑outs & grout repair, LVP/laminate board swaps','Mount/Install: TVs (wire‑conceal add‑on), blinds, curtain rods, mirrors, pictures','Assembly: furniture, storage racks, prefab units','Window cleaning (interior/exterior; screens & sills)','Basic pest control (ants/roaches; wasp nest removal where safe — no termites)'] },
+      { key:'lawn', title:'Lawn & Outdoor', hero:IMG.lawn, list:['Trimming/weed‑eating & edging; hedge/bush shaping','Flowerbeds: design/build, edging, soil amending, mulch install','Planters & Raised Beds: build/install, fill soil mix, placement','Garden prep: bed turning, compost/topsoil mix, basic drip/soaker setup','Cleanup: leaf/brush cleanup (light), haul‑off','Gutter cleaning (single story)','Power washing: siding, decks, patios, driveways','Holiday lights: hanging/removal'] },
+      { key:'mechanic', title:'Mobile Mechanic (Basic to Light Service)', hero:IMG.mechanic, list:['Battery swap / jump start','Flat repair / air (where safe), spare changeover','Wiper & bulb replacement, fluid top‑offs, OBD‑II code read','Brake jobs (pads / rotors, inspection)','Oil changes (standard or synthetic; includes filter)','Spark plug replacement','Tune‑ups (filters, plugs, belts, fluids)','Stereo/radio installs & subwoofer wiring'] },
+      { key:'builds', title:'Builds & Construction', hero:IMG.builds, list:['Porches & small decks — new builds, resurfacing, railings, stairs, skirting, lattice','Patios (pavers/stone) — base prep, compaction, edging, polymeric sand finish','Walkways (gravel/paver/stepping stone) — layout, base, edging','Fencing & gates — wood repairs, small new runs, custom gates, hardware','Sheds & pergolas — small shed builds, prefab assembly, pergolas/awnings','Exterior carpentry — fascia/soffit patches, door/sill replacement, trim','Small interior upgrades — vanity swaps, backsplash installs, accent walls, wainscoting','Tile & bathroom remodels — surrounds, grout & waterproofing, small bath refreshes','Concrete (minor) — step patches, small pads/leveling'] },
+      { key:'membership', title:'Membership Plans', hero:IMG.logo, list:['Gopher Basic — $99/mo • 3 hours • 10% off extra ($36/hr) • 48‑hr priority • roll over 2 months','Gopher Plus — $199/mo • 6 hours • 15% off extra ($34/hr) • same‑week priority • quarterly perk • roll over 3 months','Gopher Gold — $349/mo • 10 hours • 20% off extra ($32/hr) • guaranteed slot • free emergency or mobile mechanic service / mo • free travel up to 25mi','Materials billed separately (+25% when Gopher’s supplies). Cancel anytime.'] },
+      { key:'oldproj', title:'Project Gallery', hero:IMG.joblog, list:['Prior Projects'] }
+    ];
+    let active = 'general';
+    const $ = s => document.querySelector(s);
+    const $$ = s => document.querySelectorAll(s);
+    function renderTabs() { const bar = $('#tabBar'); bar.innerHTML = SERVICES.map(s => `<button class="tab ${active===s.key?'active':'inactive'}" data-tab="${s.key}">${s.title}</button>`).join(''); $$('#tabBar .tab').forEach(btn => btn.onclick = () => { active = btn.dataset.tab; renderSection(); renderTabs(); }); }
+    function renderSection() { const sec = $('#sectionArea'); const group = SERVICES.find(s => s.key===active); if (active === 'oldproj') { sec.innerHTML = `<div class="flex flex-col space-y-6"><div class="card overflow-hidden"><div class="w-full h-64 sm:h-80 bg-amber-50 flex items-center justify-center"><img src="${group.hero}" alt="${group.title}" class="max-h-full w-auto object-contain fade-in" onload="this.classList.add('show')"></div><div class="p-4 sm:p-6 space-y-6"><div class="card p-4 sm:p-6 border border-stone-200"><div class="bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-lg mb-4">LVP, Countertops, and Paint</div><div class="grid grid-cols-2 gap-4 mb-4 text-center"><div class="font-bold text-stone-700">Before</div><div class="font-bold text-stone-700">After</div></div><div class="grid grid-cols-2 gap-4"><div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clarklvpb4.jpg" alt="Before: LVP, countertops, and paint project" class="w-full h-full object-cover"></div><div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clark-lvp.webp" alt="After: LVP, countertops, and paint project" class="w-full h-full object-cover"></div><div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="ClarkKitb4.jpg" alt="Before: LVP, countertops, and paint project" class="w-full h-full object-cover"></div><div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clark_kit.webp" alt="After: LVP, countertops, and paint project" class="w-full h-full object-cover"></div><div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="ClarkdiningB4.jpg" alt="Before: LVP, countertops, and paint project" class="w-full h-full object-cover"></div><div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clark_dining.webp" alt="After: LVP, countertops, and paint project" class="w-full h-full object-cover"></div></div></div><div class="card p-4 sm:p-6 border border-stone-200"><div class="bg-amber-400 text-stone-900 text-sm font-semibold px-4 py-2 rounded-lg mb-4">Bathroom Remodel</div><div class="grid grid-cols-2 gap-4 mb-4 text-center"><div class="font-bold text-stone-700">Before</div><div class="font-bold text-stone-700">After</div></div><div class="grid grid-cols-2 gap-4"><div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="bathroombef1.jpg" alt="Before: bathroom remodel" class="w-full h-full object-cover"></div><div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="bathroomaft1.webp" alt="After: bathroom remodel" class="w-full h-full object-cover"></div><div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="bathroombef2.jpg" alt="Before: bathroom remodel" class="w-full h-full object-cover"></div><div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="bathroomaft2.webp" alt="After: bathroom remodel" class="w-full h-full object-cover"></div></div></div></div></div></div>`; return; } sec.innerHTML = `<div class="card overflow-hidden"><div class="w-full h-64 sm:h-80 bg-amber-50 flex items-center justify-center"><img src="${group.hero}" alt="${group.title}" class="max-h-full w-auto object-contain fade-in" onload="this.classList.add('show')"></div><div class="p-4 sm:p-6"><h2 class="text-2xl font-extrabold mb-2">${group.title}</h2><ul class="list-disc pl-5 space-y-1">${group.list.map(item=>`<li>${item}</li>`).join('')}</ul></div></div>`; }
+    document.getElementById('logoImg').src = IMG.logo; document.getElementById('yr').innerText = new Date().getFullYear(); renderTabs(); renderSection();
+    const chatLauncher = document.getElementById('chatLauncher'); const chatPanel = document.getElementById('chatPanel'); const chatClose = document.getElementById('chatClose'); const chatForm = document.getElementById('chatForm'); const chatInput = document.getElementById('chatInput'); const chatLog = document.getElementById('chatLog'); let lastFocus = null; const bottomBarId = 'bottomCTA'; const gap = 12;
+    function getBottomBarHeight() { const bar = document.getElementById(bottomBarId); if (!bar) return 0; const rect = bar.getBoundingClientRect(); return rect.height || bar.offsetHeight || 0; }
+    function updateFooterOffset() { document.documentElement.style.setProperty('--gopher-footer-offset', `${getBottomBarHeight()}px`); }
+    function setWidgetPosition(right, bottom) { chatLauncher.style.right = `${right}px`; chatLauncher.style.bottom = `${bottom}px`; }
+    function positionAboveBottomBar() { updateFooterOffset(); const barHeight = getBottomBarHeight(); setWidgetPosition(20, Math.max(gap, barHeight + gap + 8)); }
+    function setOpen(isOpen) { chatPanel.dataset.open = String(isOpen); chatLauncher.setAttribute('aria-expanded', String(isOpen)); if (isOpen) { lastFocus = document.activeElement; } else if (lastFocus) { lastFocus.focus(); } }
+    function appendUserMessage(text) { const row = document.createElement('div'); row.className = 'chat-row user'; const bubble = document.createElement('div'); bubble.className = 'bubble'; bubble.textContent = text; row.appendChild(bubble); chatLog.appendChild(row); chatLog.scrollTop = chatLog.scrollHeight; }
+    function appendBotMessage(text) { const row = document.createElement('div'); row.className = 'chat-row bot'; const wrap = document.createElement('div'); wrap.className = 'bot-message-wrap'; const avatar = document.createElement('img'); avatar.className = 'bot-avatar'; avatar.src = 'image-28.png'; avatar.alt = 'Gopher avatar'; const bubble = document.createElement('div'); bubble.className = 'bubble'; bubble.textContent = text; wrap.appendChild(avatar); wrap.appendChild(bubble); row.appendChild(wrap); chatLog.appendChild(row); chatLog.scrollTop = chatLog.scrollHeight; }
+    chatInput.addEventListener('focus', () => { chatInput.removeAttribute('readonly'); });
+    chatLauncher.addEventListener('click', () => { setOpen(chatPanel.dataset.open !== 'true'); });
     chatClose.addEventListener('click', () => setOpen(false));
-
-    chatForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const message = chatInput.value.trim();
-      if (!message) return;
-
-      appendUserMessage(message);
-      chatInput.value = '';
-      chatInput.style.height = 'auto';
-      appendTyping();
-
-      try {
-        const response = await sendToBot(message);
-        removeTyping();
-        const reply = formatReply(response);
-        appendBotMessage(reply);
-      } catch (err) {
-        removeTyping();
-        appendBotMessage(`Error: ${err.message}`);
-      }
-    });
-
-    // Auto-resize textarea
-    chatInput.addEventListener('input', () => {
-      chatInput.style.height = 'auto';
-      chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
-    });
-
-    // Set current year in footer
-    document.getElementById('yr').textContent = new Date().getFullYear();
-
+    document.addEventListener('keydown', event => { if (event.key === 'Escape' && chatPanel.dataset.open === 'true') { setOpen(false); } });
+    const CHATBOT_API_URL = '/api/chat';
+    async function getReply(message) { const response = await fetch(CHATBOT_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message }) }); if (!response.ok) { throw new Error('Chatbot request failed.'); } const data = await response.json(); return data.reply || 'Sorry, I could not generate a reply just now.'; }
+    positionAboveBottomBar(); window.addEventListener('resize', positionAboveBottomBar); window.addEventListener('load', positionAboveBottomBar);
+    chatForm.addEventListener('submit', async event => { event.preventDefault(); const message = chatInput.value.trim(); if (!message) return; appendUserMessage(message); chatInput.value = ''; try { const reply = await getReply(message); appendBotMessage(reply); } catch (error) { appendBotMessage('Sorry — the chat service is temporarily unavailable. Please try again or text Gopher directly.'); console.error(error); } });
   </script>
-
 </body>
 </html>
