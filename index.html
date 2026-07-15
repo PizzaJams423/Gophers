@@ -531,98 +531,135 @@ function setWidgetPosition(right, bottom) {
       }
     });
 
-const CHATBOT_API_URL = '/api/chat';
 
-const FIELD_HINTS = {
-  service: 'Try mentioning the service type, like LVP, painting, tile install, drywall, electrical, or general repair.',
-  quantity: 'Include a size or amount, such as 200 sq ft, 15 linear ft, 3 doors, or 4 units.',
-  hours: 'Add hours for hourly work, like 2 hours or 4.5 hours.',
-  name: 'Tell me the client name.',
-  phone: 'Add a phone number, like 423-555-1234.',
-  email: 'Add an email address, like name@example.com.',
-};
+  const CHATBOT_API_URL = '/api/chat';
 
-function formatErrorMessage(responseData, status) {
-  const base =
-    responseData?.detail ||
-    responseData?.error ||
-    responseData?.message ||
-    (typeof responseData === 'string' ? responseData : '') ||
-    `HTTP ${status}`;
-  return `${base} (HTTP ${status})`;
-}
+  const FIELD_HINTS = {
+    service: 'Try mentioning the service type, like LVP, painting, tile install, drywall, electrical, or general repair.',
+    quantity: 'Include a size or amount, such as 200 sq ft, 15 linear ft, 3 doors, or 4 units.',
+    hours: 'Add hours for hourly work, like 2 hours or 4.5 hours.',
+    name: 'Tell me the client name.',
+    phone: 'Add a phone number, like 423-555-1234.',
+    email: 'Add an email address, like name@example.com.',
+  };
 
-function formatReply(data) {
-  if (!data) return 'Sorry — I could not get a response.';
-  if (typeof data === 'string') return data;
-  if (data.reply) return data.reply;
-  if (data.message) return data.message;
-  if (data.detail) return data.detail;
-  if (data.error) return data.error;
-
-  if (data.status === 'need_more_info') {
-    const fieldList =
-      Array.isArray(data.missing) && data.missing.length
-        ? ` Missing: ${data.missing.join(', ')}.`
-        : '';
-    const hint =
-      data.missing && FIELD_HINTS[data.missing[0]]
-        ? ` ${FIELD_HINTS[data.missing[0]]}`
-        : '';
-    return (data.question || 'I need a little more info.') + fieldList + hint;
+  function formatErrorMessage(responseData, status) {
+    const base =
+      responseData?.detail ||
+      responseData?.error ||
+      responseData?.message ||
+      (typeof responseData === 'string' ? responseData : '') ||
+      `HTTP ${status}`;
+    return `${base} (HTTP ${status})`;
   }
 
-  if (data.status === 'complete' && data.estimate) {
-    const e = data.estimate;
-    let msg = `Estimate ready: $${e.low} to $${e.high}.`;
-    if (e.service_label) msg += ` Service: ${e.service_label}.`;
-    if (typeof e.quantity !== 'undefined' && e.unit) msg += ` Amount: ${e.quantity} ${e.unit}.`;
-    msg += ` Labor: $${Number(e.labor ?? 0).toFixed(2)}.`;
-    msg += ` Add-ons: $${Number(e.addons ?? 0).toFixed(2)}.`;
-    msg += ` Final estimate: $${Number(e.final_estimate ?? 0).toFixed(2)}.`;
-    if (e.notes && e.notes.length) msg += '
+  function formatReply(data) {
+    if (!data) return 'Sorry — I could not get a response.';
+    if (typeof data === 'string') return data;
+    if (data.reply) return data.reply;
+    if (data.message) return data.message;
+    if (data.detail) return data.detail;
+    if (data.error) return data.error;
+
+    if (data.status === 'need_more_info') {
+      const fieldList =
+        Array.isArray(data.missing) && data.missing.length
+          ? ` Missing: ${data.missing.join(', ')}.`
+          : '';
+      const hint =
+        data.missing && FIELD_HINTS[data.missing[0]]
+          ? ` ${FIELD_HINTS[data.missing[0]]}`
+          : '';
+      return (data.question || 'I need a little more info.') + fieldList + hint;
+    }
+
+    if (data.status === 'complete' && data.estimate) {
+      const e = data.estimate;
+      let msg = `Estimate ready: $${e.low} to $${e.high}.`;
+      if (e.service_label) msg += ` Service: ${e.service_label}.`;
+      if (typeof e.quantity !== 'undefined' && e.unit) msg += ` Amount: ${e.quantity} ${e.unit}.`;
+      msg += ` Labor: $${Number(e.labor ?? 0).toFixed(2)}.`;
+      msg += ` Add-ons: $${Number(e.addons ?? 0).toFixed(2)}.`;
+      msg += ` Final estimate: $${Number(e.final_estimate ?? 0).toFixed(2)}.`;
+      if (e.notes && e.notes.length) msg += '
 Notes:
 - ' + e.notes.join('
 - ');
-    if (data.sheets_logged !== undefined) msg += `
+      if (data.sheets_logged !== undefined) msg += `
 Sheets logged: ${data.sheets_logged ? 'yes' : 'no'}.`;
-    if (data.sheets_error) msg += `
+      if (data.sheets_error) msg += `
 Sheets error: ${data.sheets_error}.`;
-    return msg;
+      return msg;
+    }
+
+    return JSON.stringify(data, null, 2);
   }
 
-  return JSON.stringify(data, null, 2);
-}
+  async function getReply(message) {
+    const response = await fetch(CHATBOT_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json, text/plain, */*'
+      },
+      body: JSON.stringify({
+        session_id: 'default',
+        text: message
+      })
+    });
 
-async function getReply(message) {
-  const response = await fetch(CHATBOT_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json, text/plain, */*'
-    },
-    body: JSON.stringify({
-      session_id: 'default',
-      text: message
-    })
+    const raw = await response.text();
+    let data = null;
+    try {
+      data = raw ? JSON.parse(raw) : null;
+    } catch {
+      data = raw;
+    }
+
+    if (!response.ok) {
+      throw new Error(formatErrorMessage(data, response.status));
+    }
+
+    return formatReply(data);
+  }
+
+  chatInput.addEventListener('focus', () => {
+    chatInput.removeAttribute('readonly');
   });
 
-  const raw = await response.text();
-  let data = null;
-  try {
-    data = raw ? JSON.parse(raw) : null;
-  } catch {
-    data = raw;
-  }
+  chatLauncher.addEventListener('click', () => {
+    setOpen(chatPanel.dataset.open !== 'true');
+  });
 
-  if (!response.ok) {
-    throw new Error(formatErrorMessage(data, response.status));
-  }
+  chatClose.addEventListener('click', () => setOpen(false));
 
-  return formatReply(data);
-}
-    })
-        
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && chatPanel.dataset.open === 'true') {
+      setOpen(false);
+    }
+  });
+
+  positionAboveBottomBar();
+  window.addEventListener('resize', positionAboveBottomBar);
+  window.addEventListener('load', positionAboveBottomBar);
+
+  chatForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    const message = chatInput.value.trim();
+    if (!message) return;
+
+    appendUserMessage(message);
+    chatInput.value = '';
+
+    try {
+      const reply = await getReply(message);
+      appendBotMessage(reply);
+    } catch (error) {
+      appendBotMessage(`Sorry — the chat service returned an error: ${error.message}`);
+      console.error(error);
+    }
+  });
+
 
   </script>
 </body>
