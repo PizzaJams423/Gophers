@@ -57,7 +57,6 @@
       flex-direction: column;
       z-index: var(--chat-z);
     }
-    .chat-panel[data-open="true"] { display: flex; }
     .chat-header {
       background: linear-gradient(135deg, #b45309, #f59e0b);
       color: #fff;
@@ -465,14 +464,10 @@
       document.documentElement.style.setProperty('--gopher-footer-offset', `${getBottomBarHeight()}px`);
     }
 
-    function setWidgetPosition(right, bottom) {
-      chatLauncher.style.right = `${right}px`;
-      chatLauncher.style.bottom = `${bottom}px`;
-      chatPanel.style.inset = '0';
-      chatPanel.style.right = '0';
-      chatPanel.style.bottom = '0';
-      chatPanel.style.left = '0';
-    }
+function setWidgetPosition(right, bottom) {
+  chatLauncher.style.right = `${right}px`;
+  chatLauncher.style.bottom = `${bottom}px`;
+}
 
     function positionAboveBottomBar() {
       updateFooterOffset();
