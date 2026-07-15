@@ -1,18 +1,185 @@
-<!DOCTYPE html><html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="cid:css-4d11e47a-a01a-4fa8-8700-8688823c5038@mhtml.blink" />
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Gopher’s Handyman Service — quick estimates and service info for Chattanooga and nearby areas." />
+  <meta name="theme-color" content="#f59e0b" />
   <title>Gopher’s Handyman Service</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com/">
-  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&amp;family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
-  
-  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html, body { background: #fff7ed; }
+    :root { --gopher-footer-offset: 0px; --chat-z: 99999; }
+    .fade-in { opacity: 0; transition: opacity .35s ease-in; }
+    .fade-in.show { opacity: 1; }
+    .card { background: #fff; border-radius: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+    .chat-launcher, .chat-panel, .chat-panel * { box-sizing: border-box; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .chat-launcher {
+      position: fixed;
+      right: 20px;
+      bottom: calc(var(--gopher-footer-offset, 0px) + 20px);
+      width: 64px;
+      height: 64px;
+      border: 0;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #f59e0b, #fbbf24);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 16px 34px rgba(245,158,11,.34);
+      cursor: pointer;
+      z-index: var(--chat-z);
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+    .chat-launcher:hover { transform: translateY(-1px); box-shadow: 0 18px 38px rgba(245,158,11,.38); }
+    .chat-launcher:focus-visible, .chat-close:focus-visible, .chat-send:focus-visible, .chat-input:focus-visible {
+      outline: 3px solid rgba(245,158,11,.30);
+      outline-offset: 3px;
+    }
+    .chat-panel {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #fffaf1;
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      z-index: var(--chat-z);
+    }
+    .chat-header {
+      background: linear-gradient(135deg, #b45309, #f59e0b);
+      color: #fff;
+      padding: 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .chat-title {
+      margin: 0;
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 1.16rem;
+      font-weight: 700;
+    }
+    .chat-subtitle {
+      margin: 6px 0 0;
+      font-size: .92rem;
+      line-height: 1.45;
+      color: rgba(255,255,255,.9);
+    }
+    .chat-close {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.22);
+      background: rgba(255,255,255,.12);
+      color: #fff;
+      cursor: pointer;
+    }
+    .chat-body {
+      flex: 1;
+      overflow: auto;
+      padding: 16px;
+      background: linear-gradient(180deg, #fffdf8 0%, #fff7ed 100%);
+    }
+    .chat-row { display: flex; margin-bottom: 12px; }
+    .chat-row.bot { justify-content: flex-start; }
+    .chat-row.user { justify-content: flex-end; }
+    .bot-message-wrap { display: flex; align-items: flex-start; max-width: 84%; }
+    .bot-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      object-fit: cover;
+      flex: 0 0 auto;
+      margin-right: 10px;
+      margin-top: 2px;
+    }
+    .bubble {
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-size: .96rem;
+      line-height: 1.58;
+      white-space: pre-wrap;
+    }
+    .bot .bubble {
+      background: #fffbeb;
+      border: 1px solid rgba(245,158,11,.12);
+      color: #292524;
+      border-bottom-left-radius: 6px;
+    }
+    .user .bubble {
+      background: #f59e0b;
+      color: #fff;
+      border-bottom-right-radius: 6px;
+      max-width: 84%;
+    }
+    .chat-footer {
+      border-top: 1px solid rgba(245,158,11,.12);
+      padding: 12px;
+      background: #fff;
+    }
+    .chat-note { font-size: .76rem; color: #57534e; margin: 0 0 10px; }
+    .chat-form {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+    .chat-input {
+      width: 100%;
+      min-height: 48px;
+      max-height: 120px;
+      resize: vertical;
+      border: 1px solid rgba(245,158,11,.18);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font: inherit;
+      color: #292524;
+      background: #fff;
+    }
+    .chat-send {
+      min-width: 52px;
+      height: 48px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 14px;
+      background: #f59e0b;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+    @media (max-width: 640px) {
+      .chat-launcher {
+        right: 16px;
+        bottom: calc(var(--gopher-footer-offset, 0px) + 16px);
+        width: 60px;
+        height: 60px;
+      }
+    }
+  </style>
 </head>
 <body class="text-stone-900">
   <div id="bottomCTA" class="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-white/95 backdrop-blur border-t border-stone-200 shadow-[0_-2px_10px_rgba(0,0,0,0.08)]">
     <div class="grid grid-cols-2 gap-2 p-3">
       <a href="tel:+14238882856" class="flex items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-white font-semibold shadow active:scale-[0.99]" aria-label="Call Gopher at 423-888-2856">Call</a>
-      <a href="sms:+14238882856?&amp;body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate." class="flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-white font-semibold shadow active:scale-[0.99]" aria-label="Text Gopher for an estimate">Text</a>
+      <a href="sms:+14238882856?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate." class="flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-white font-semibold shadow active:scale-[0.99]" aria-label="Text Gopher for an estimate">Text</a>
     </div>
   </div>
 
@@ -24,33 +191,30 @@
     </div>
   </header>
 
-  <nav id="tabBar" class="max-w-6xl mx-auto px-2 pt-3 grid grid-cols-2 sm:grid-cols-5 gap-2"></nav>
-  <main id="sectionArea" class="max-w-6xl mx-auto px-4 py-6 pb-24 sm:pb-6"></main>
-
-  <section class="max-w-6xl mx-auto px-4 py-4">
-    <div class="card p-4">
+  <main class="max-w-6xl mx-auto px-4 py-6 pb-24 sm:pb-6">
+    <section class="card p-4">
       <div class="w-full flex items-center justify-center mb-3">
-        <img src="https://d2z0o16i8xm8ak.cloudfront.net/web/direct-files/9d0ecd5ffcaf8f193aa86772227080df/36578919-22f6-4309-9076-9164178e3b21/file_0000000033c061f58a296450d1d6f625.png" alt="Virtual Estimates Coming Soon!" class="max-h-40 sm:max-h-48 w-auto fade-in">
+        <img src="./file_0000000033c061f58a296450d1d6f625.png" alt="Virtual Estimates Coming Soon!" class="max-h-40 sm:max-h-48 w-auto fade-in" onload="this.classList.add('show')">
       </div>
       <div class="flex flex-wrap gap-2 justify-end">
-        <a id="smsLink" href="sms:+14238882856?&amp;body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate." class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow">Text Gopher</a>
+        <a id="smsLink" href="sms:+14238882856?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate." class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow">Text Gopher</a>
         <a id="callLink" href="tel:+14238882856" class="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow">Call Gopher</a>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
   <footer class="text-center text-sm text-stone-600 py-8">© <span id="yr"></span> Gopher’s Handyman Service — Chattanooga, TN</footer>
 
   <button class="chat-launcher" id="chatLauncher" aria-controls="chatPanel" aria-expanded="false" aria-label="Open chat">
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M8 10h8M8 14h5m-7 6 1.6-3.2A8 8 0 1 1 20 12a8 8 0 0 1-8 8H6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+      <path d="M8 10h8M8 14h5m-7 6 1.6-3.2A8 8 0 1 1 20 12a8 8 0 0 1-8 8H6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </button>
 
   <section class="chat-panel" id="chatPanel" aria-label="Website chat" data-open="false">
     <header class="chat-header">
       <div style="display:flex;align-items:center;gap:12px;">
-        <img src="https://d2z0o16i8xm8ak.cloudfront.net/web/direct-files/9d0ecd5ffcaf8f193aa86772227080df/36578919-22f6-4309-9076-9164178e3b21/image-38.png" alt="Gopher avatar" width="44" height="44" style="width:44px;height:44px;border-radius:999px;object-fit:cover;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);box-shadow:0 3px 10px rgba(0,0,0,.12);" loading="lazy">
+        <img src="./image-38.png" alt="Gopher avatar" width="44" height="44" style="width:44px;height:44px;border-radius:999px;object-fit:cover;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);box-shadow:0 3px 10px rgba(0,0,0,.12);" loading="lazy">
         <div>
           <h2 class="chat-title">Gopher's Estimate Bot</h2>
           <p class="chat-subtitle">Ask for a quick estimate.</p>
@@ -62,7 +226,7 @@
     <div class="chat-body" id="chatLog" role="log" aria-live="polite" aria-relevant="additions text">
       <div class="chat-row bot">
         <div class="bot-message-wrap">
-          <img class="bot-avatar" src="https://d2z0o16i8xm8ak.cloudfront.net/web/direct-files/9d0ecd5ffcaf8f193aa86772227080df/36578919-22f6-4309-9076-9164178e3b21/image-28.png" alt="Gopher avatar">
+          <img class="bot-avatar" src="./image-28.png" alt="Gopher avatar">
           <div class="bubble">Hey there! Thanks for choosing Gopher’s! Tell us a little more about your job and we'll give you an estimate!</div>
         </div>
       </div>
@@ -78,175 +242,177 @@
     </footer>
   </section>
 
-
-</body></html>
-------MultipartBoundary--hlyi3BJsGIg3ibvvSgQm2XDJIBqvyu2GAYRlfNDS2w----
-Content-Type: text/css
-Content-Transfer-Encoding: binary
-Content-Location: https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap
-
-@charset "utf-8";
-
-@font-face { font-family: Fraunces; font-style: normal; font-weight: 600; font-display: swap; src: url("https://fonts.gstatic.com/s/fraunces/v38/6NU78FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0KxCBTeP2Xz5fU8w.woff2") format("woff2"); unicode-range: U+102-103, U+110-111, U+128-129, U+168-169, U+1A0-1A1, U+1AF-1B0, U+300-301, U+303-304, U+308-309, U+323, U+329, U+1EA0-1EF9, U+20AB; }
-
-@font-face { font-family: Fraunces; font-style: normal; font-weight: 600; font-display: swap; src: url("https://fonts.gstatic.com/s/fraunces/v38/6NU78FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0KxCFTeP2Xz5fU8w.woff2") format("woff2"); unicode-range: U+100-2BA, U+2BD-2C5, U+2C7-2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-
-@font-face { font-family: Fraunces; font-style: normal; font-weight: 600; font-display: swap; src: url("https://fonts.gstatic.com/s/fraunces/v38/6NU78FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0KxC9TeP2Xz5c.woff2") format("woff2"); unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-
-@font-face { font-family: Fraunces; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/fraunces/v38/6NU78FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0KxCBTeP2Xz5fU8w.woff2") format("woff2"); unicode-range: U+102-103, U+110-111, U+128-129, U+168-169, U+1A0-1A1, U+1AF-1B0, U+300-301, U+303-304, U+308-309, U+323, U+329, U+1EA0-1EF9, U+20AB; }
-
-@font-face { font-family: Fraunces; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/fraunces/v38/6NU78FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0KxCFTeP2Xz5fU8w.woff2") format("woff2"); unicode-range: U+100-2BA, U+2BD-2C5, U+2C7-2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-
-@font-face { font-family: Fraunces; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/fraunces/v38/6NU78FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0KxC9TeP2Xz5c.woff2") format("woff2"); unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+460-52F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+301, U+400-45F, U+490-491, U+4B0-4B1, U+2116; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+1F00-1FFF; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+370-377, U+37A-37F, U+384-38A, U+38C, U+38E-3A1, U+3A3-3FF; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+102-103, U+110-111, U+128-129, U+168-169, U+1A0-1A1, U+1AF-1B0, U+300-301, U+303-304, U+308-309, U+323, U+329, U+1EA0-1EF9, U+20AB; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+100-2BA, U+2BD-2C5, U+2C7-2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2") format("woff2"); unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 500; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+460-52F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 500; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+301, U+400-45F, U+490-491, U+4B0-4B1, U+2116; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 500; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+1F00-1FFF; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 500; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+370-377, U+37A-37F, U+384-38A, U+38C, U+38E-3A1, U+3A3-3FF; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 500; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+102-103, U+110-111, U+128-129, U+168-169, U+1A0-1A1, U+1AF-1B0, U+300-301, U+303-304, U+308-309, U+323, U+329, U+1EA0-1EF9, U+20AB; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 500; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+100-2BA, U+2BD-2C5, U+2C7-2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 500; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2") format("woff2"); unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 600; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+460-52F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 600; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+301, U+400-45F, U+490-491, U+4B0-4B1, U+2116; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 600; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+1F00-1FFF; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 600; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+370-377, U+37A-37F, U+384-38A, U+38C, U+38E-3A1, U+3A3-3FF; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 600; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+102-103, U+110-111, U+128-129, U+168-169, U+1A0-1A1, U+1AF-1B0, U+300-301, U+303-304, U+308-309, U+323, U+329, U+1EA0-1EF9, U+20AB; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 600; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+100-2BA, U+2BD-2C5, U+2C7-2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 600; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2") format("woff2"); unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+460-52F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+301, U+400-45F, U+490-491, U+4B0-4B1, U+2116; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+1F00-1FFF; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+370-377, U+37A-37F, U+384-38A, U+38C, U+38E-3A1, U+3A3-3FF; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+102-103, U+110-111, U+128-129, U+168-169, U+1A0-1A1, U+1AF-1B0, U+300-301, U+303-304, U+308-309, U+323, U+329, U+1EA0-1EF9, U+20AB; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+100-2BA, U+2BD-2C5, U+2C7-2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2") format("woff2"); unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 800; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+460-52F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 800; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+301, U+400-45F, U+490-491, U+4B0-4B1, U+2116; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 800; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+1F00-1FFF; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 800; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+370-377, U+37A-37F, U+384-38A, U+38C, U+38E-3A1, U+3A3-3FF; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 800; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+102-103, U+110-111, U+128-129, U+168-169, U+1A0-1A1, U+1AF-1B0, U+300-301, U+303-304, U+308-309, U+323, U+329, U+1EA0-1EF9, U+20AB; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 800; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7W0Q5n-wU.woff2") format("woff2"); unicode-range: U+100-2BA, U+2BD-2C5, U+2C7-2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-
-@font-face { font-family: Inter; font-style: normal; font-weight: 800; font-display: swap; src: url("https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2") format("woff2"); unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-------MultipartBoundary--hlyi3BJsGIg3ibvvSgQm2XDJIBqvyu2GAYRlfNDS2w----
-Content-Type: text/css
-Content-Transfer-Encoding: binary
-Content-Location: cid:css-4d11e47a-a01a-4fa8-8700-8688823c5038@mhtml.blink
-
-@charset "utf-8";
-
-html, body { background: rgb(255, 247, 237); }
-
-:root { --gopher-footer-offset: 0px; --chat-z: 99999; }
-
-.fade-in { opacity: 0; transition: opacity 0.35s ease-in; }
-
-.fade-in.show { opacity: 1; }
-
-.tab { border-radius: 1rem; padding: 0.5rem 0.75rem; font-weight: 600; box-shadow: rgba(0, 0, 0, 0.08) 0px 1px 2px; }
-
-.tab.active { background: rgb(245, 158, 11); color: rgb(255, 255, 255); }
-
-.tab.inactive { background: rgb(255, 255, 255); }
-
-.tab.inactive:hover { background: rgb(255, 251, 235); }
-
-.card { background: rgb(255, 255, 255); border-radius: 1rem; box-shadow: rgba(0, 0, 0, 0.08) 0px 1px 4px; }
-
-.chat-launcher, .chat-panel, .chat-panel * { box-sizing: border-box; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-
-.chat-launcher { position: fixed; right: 20px; bottom: calc(var(--gopher-footer-offset, 0px) + 20px); width: 64px; height: 64px; border: 0px; border-radius: 999px; background: linear-gradient(135deg, rgb(245, 158, 11), rgb(251, 191, 36)); color: rgb(255, 255, 255); display: inline-flex; align-items: center; justify-content: center; box-shadow: rgba(245, 158, 11, 0.34) 0px 16px 34px; cursor: pointer; z-index: var(--chat-z); transition: transform 180ms, box-shadow 180ms; pointer-events: auto; }
-
-.chat-launcher:hover { transform: translateY(-1px); box-shadow: rgba(245, 158, 11, 0.38) 0px 18px 38px; }
-
-.chat-launcher:focus-visible, .chat-close:focus-visible, .chat-send:focus-visible, .chat-input:focus-visible { outline: rgba(245, 158, 11, 0.3) solid 3px; outline-offset: 3px; }
-
-.chat-panel { position: fixed; inset: 0px; width: 100vw; height: 100vh; background: rgb(255, 250, 241); border: 0px; border-radius: 0px; box-shadow: none; overflow: hidden; display: none; flex-direction: column; z-index: var(--chat-z); }
-
-.chat-header { background: linear-gradient(135deg, rgb(180, 83, 9), rgb(245, 158, 11)); color: rgb(255, 255, 255); padding: 18px 18px 16px; display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; flex: 0 0 auto; }
-
-.chat-title { margin: 0px; font-family: Fraunces, Georgia, serif; font-size: 1.16rem; font-weight: 700; letter-spacing: -0.02em; }
-
-.chat-subtitle { margin: 6px 0px 0px; font-size: 0.92rem; line-height: 1.45; color: rgba(255, 255, 255, 0.9); }
-
-.chat-close { width: 38px; height: 38px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.22); background: rgba(255, 255, 255, 0.12); color: rgb(255, 255, 255); cursor: pointer; flex: 0 0 auto; }
-
-.chat-body { flex: 1 1 0%; overflow: auto; padding: 16px; background: linear-gradient(rgb(255, 253, 248) 0%, rgb(255, 247, 237) 100%); }
-
-.chat-row { display: flex; margin-bottom: 12px; }
-
-.chat-row.bot { justify-content: flex-start; }
-
-.chat-row.user { justify-content: flex-end; }
-
-.bot-message-wrap { display: flex; align-items: flex-start; max-width: 84%; }
-
-.bot-avatar { width: 34px; height: 34px; border-radius: 999px; object-fit: cover; flex: 0 0 auto; margin-right: 10px; margin-top: 2px; }
-
-.bubble { padding: 12px 14px; border-radius: 16px; font-size: 0.96rem; line-height: 1.58; white-space: pre-wrap; }
-
-.bot .bubble { background: rgb(255, 251, 235); border: 1px solid rgba(245, 158, 11, 0.12); color: rgb(41, 37, 36); border-bottom-left-radius: 6px; }
-
-.user .bubble { background: rgb(245, 158, 11); color: rgb(255, 255, 255); border-bottom-right-radius: 6px; max-width: 84%; }
-
-.chat-footer { border-top: 1px solid rgba(245, 158, 11, 0.12); padding: 12px; background: rgb(255, 255, 255); flex: 0 0 auto; }
-
-.chat-note { font-size: 0.76rem; color: rgb(87, 83, 78); margin: 0px 0px 10px; }
-
-.chat-form { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; }
-
-.chat-input { width: 100%; min-height: 48px; max-height: 120px; resize: vertical; border: 1px solid rgba(245, 158, 11, 0.18); border-radius: 14px; padding: 12px 14px; font: inherit; color: rgb(41, 37, 36); background: rgb(255, 255, 255); }
-
-.chat-send { min-width: 52px; height: 48px; padding: 0px 16px; border: 0px; border-radius: 14px; background: rgb(245, 158, 11); color: rgb(255, 255, 255); font-weight: 700; cursor: pointer; }
-
-.sr-only { position: absolute; width: 1px; height: 1px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border: 0px; }
-
-@media (max-width: 640px) {
-  .chat-launcher { right: 16px; bottom: calc(var(--gopher-footer-offset, 0px) + 16px); width: 60px; height: 60px; }
-  .chat-panel { inset: 0px; width: 100vw; height: 100vh; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .chat-launcher, .chat-panel, .chat-panel * { scroll-behavior: auto; transition: none !important; }
-}
-------MultipartBoundary--hlyi3BJsGIg3ibvvSgQm2XDJIBqvyu2GAYRlfNDS2w------
+  <script>
+    const chatLauncher = document.getElementById('chatLauncher');
+    const chatPanel = document.getElementById('chatPanel');
+    const chatClose = document.getElementById('chatClose');
+    const chatForm = document.getElementById('chatForm');
+    const chatInput = document.getElementById('chatInput');
+    const chatLog = document.getElementById('chatLog');
+    const API_BASE = 'https://gbot-vs3h.onrender.com';
+    const SESSION_KEY = 'gopherbot_session_id';
+
+    function getSessionId() {
+      let id = localStorage.getItem(SESSION_KEY);
+      if (!id) {
+        id = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+        localStorage.setItem(SESSION_KEY, id);
+      }
+      return id;
+    }
+
+    function setOpen(isOpen) {
+      chatPanel.dataset.open = String(isOpen);
+      chatLauncher.setAttribute('aria-expanded', String(isOpen));
+      chatPanel.style.display = isOpen ? 'flex' : 'none';
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+      if (isOpen) setTimeout(() => chatInput.focus(), 50);
+    }
+
+    function appendUserMessage(text) {
+      const row = document.createElement('div');
+      row.className = 'chat-row user';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = text;
+      row.appendChild(bubble);
+      chatLog.appendChild(row);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    function appendBotMessage(text) {
+      const row = document.createElement('div');
+      row.className = 'chat-row bot';
+      const wrap = document.createElement('div');
+      wrap.className = 'bot-message-wrap';
+      const avatar = document.createElement('img');
+      avatar.src = './image-28.png';
+      avatar.alt = 'Gopherbot avatar';
+      avatar.className = 'bot-avatar';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = text;
+      wrap.appendChild(avatar);
+      wrap.appendChild(bubble);
+      row.appendChild(wrap);
+      chatLog.appendChild(row);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    function appendTyping() {
+      if (document.getElementById('typingRow')) return;
+      const row = document.createElement('div');
+      row.className = 'chat-row bot';
+      row.id = 'typingRow';
+      const wrap = document.createElement('div');
+      wrap.className = 'bot-message-wrap';
+      const avatar = document.createElement('img');
+      avatar.src = './image-28.png';
+      avatar.alt = 'Gopherbot avatar';
+      avatar.className = 'bot-avatar';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = 'Typing...';
+      wrap.appendChild(avatar);
+      wrap.appendChild(bubble);
+      row.appendChild(wrap);
+      chatLog.appendChild(row);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    function removeTyping() {
+      const el = document.getElementById('typingRow');
+      if (el) el.remove();
+    }
+
+    const FIELD_HINTS = {
+      service: 'Try mentioning the service type, like LVP, painting, tile install, drywall, electrical, or general repair.',
+      quantity: 'Include a size or amount, such as 200 sq ft, 15 linear ft, 3 doors, or 4 units.',
+      hours: 'Add hours for hourly work, like 2 hours or 4.5 hours.',
+      name: 'Tell me the client name.',
+      phone: 'Add a phone number, like 423-555-1234.',
+      email: 'Add an email address, like name@example.com.',
+    };
+
+    function formatErrorMessage(err, responseData, status) {
+      const base = responseData?.detail || responseData?.error || responseData?.message || (typeof responseData === 'string' ? responseData : '') || err?.message || '';
+      const extra = status ? ` (HTTP ${status})` : '';
+      return (base || 'Request failed.') + extra;
+    }
+
+    async function sendToBot(message) {
+      const res = await fetch(`${API_BASE}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, text/plain, */*' },
+        body: JSON.stringify({ session_id: getSessionId(), text: message })
+      });
+      const raw = await res.text();
+      let data = null;
+      try { data = raw ? JSON.parse(raw) : null; } catch { data = raw; }
+      if (!res.ok) throw new Error(formatErrorMessage(null, data, res.status));
+      return data;
+    }
+
+    function formatReply(data) {
+      if (!data) return 'Sorry - I could not get a response.';
+      if (typeof data === 'string') return data;
+      if (data.reply) return data.reply;
+      if (data.message) return data.message;
+      if (data.detail) return data.detail;
+      if (data.error) return data.error;
+
+      if (data.status === 'need_more_info') {
+        const fieldList = Array.isArray(data.missing) && data.missing.length ? ` Missing: ${data.missing.join(', ')}.` : '';
+        const hint = data.missing && FIELD_HINTS[data.missing[0]] ? ` ${FIELD_HINTS[data.missing[0]]}` : '';
+        return (data.question || 'I need a little more info.') + fieldList + hint;
+      }
+
+      if (data.status === 'complete' && data.estimate) {
+        const e = data.estimate;
+        let msg = `Estimate ready: $${e.low} to $${e.high}.`;
+        if (e.service_label) msg += ` Service: ${e.service_label}.`;
+        if (typeof e.quantity !== 'undefined' && e.unit) msg += ` Amount: ${e.quantity} ${e.unit}.`;
+        msg += ` Labor: $${Number(e.labor ?? 0).toFixed(2)}.`;
+        msg += ` Add-ons: $${Number(e.addons ?? 0).toFixed(2)}.`;
+        msg += ` Final estimate: $${Number(e.final_estimate ?? 0).toFixed(2)}.`;
+        if (e.notes && e.notes.length) msg += `
+Notes:
+- ${e.notes.join('
+- ')}`;
+        if (data.sheets_logged !== undefined) msg += `
+Sheets logged: ${data.sheets_logged ? 'yes' : 'no'}.`;
+        if (data.sheets_error) msg += `
+Sheets error: ${data.sheets_error}.`;
+        return msg;
+      }
+
+      return JSON.stringify(data, null, 2);
+    }
+
+    chatLauncher.addEventListener('click', () => setOpen(true));
+    chatClose.addEventListener('click', () => setOpen(false));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && chatPanel.dataset.open === 'true') setOpen(false); });
+
+    chatForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const message = chatInput.value.trim();
+      if (!message) return;
+      appendUserMessage(message);
+      chatInput.value = '';
+      appendTyping();
+      try {
+        const data = await sendToBot(message);
+        removeTyping();
+        appendBotMessage(formatReply(data));
+      } catch (err) {
+        removeTyping();
+        appendBotMessage('Sorry - the chat service is temporarily unavailable. Please try again.');
+        console.error(err);
+      }
+    });
+
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    setOpen(false);
+  </script>
+</body>
+</html>
