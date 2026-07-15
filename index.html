@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gopher’s Handyman Service</title>
+  <title>Gopher's Handyman Service</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -56,6 +56,9 @@
       display: none;
       flex-direction: column;
       z-index: var(--chat-z);
+    }
+    .chat-panel.open {
+      display: flex;
     }
     .chat-header {
       background: linear-gradient(135deg, #b45309, #f59e0b);
@@ -211,14 +214,14 @@
   <div id="bottomCTA" class="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-white/95 backdrop-blur border-t border-stone-200 shadow-[0_-2px_10px_rgba(0,0,0,0.08)]">
     <div class="grid grid-cols-2 gap-2 p-3">
       <a href="tel:+14238882856" class="flex items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-white font-semibold shadow active:scale-[0.99]" aria-label="Call Gopher at 423-888-2856">Call</a>
-      <a href="sms:+14238882856?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate." class="flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-white font-semibold shadow active:scale-[0.99]" aria-label="Text Gopher for an estimate">Text</a>
+      <a href="sms:+14238882856?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate." class="flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-white font-semibold shadow active:scale-[0.99]" aria-label="Text Gopher">Text</a>
     </div>
   </div>
 
   <header class="sticky top-0 z-40 bg-amber-100/80 backdrop-blur border-b border-amber-200">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
       <img id="logoImg" class="h-10 w-auto rounded" alt="Gopher's logo">
-      <div class="font-extrabold text-xl">Gopher’s Handyman Service</div>
+      <div class="font-extrabold text-xl">Gopher's Handyman Service</div>
       <div class="ml-auto text-sm text-stone-600 hidden sm:block">Chattanooga + 15 mi • Text/Call: (423) 888-2856</div>
     </div>
   </header>
@@ -232,13 +235,13 @@
         <img src="file_0000000033c061f58a296450d1d6f625.png" alt="Virtual Estimates Coming Soon!" class="max-h-40 sm:max-h-48 w-auto fade-in" onload="this.classList.add('show')">
       </div>
       <div class="flex flex-wrap gap-2 justify-end">
-        <a id="smsLink" href="sms:+14238882856?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate." class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow">Text Gopher</a>
+        <a id="smsLink" href="sms:+14238882856?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate." class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow">Text Estimate</a>
         <a id="callLink" href="tel:+14238882856" class="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow">Call Gopher</a>
       </div>
     </div>
   </section>
 
-  <footer class="text-center text-sm text-stone-600 py-8">© <span id="yr"></span> Gopher’s Handyman Service — Chattanooga, TN</footer>
+  <footer class="text-center text-sm text-stone-600 py-8">© <span id="yr"></span> Gopher's Handyman Service — Chattanooga, TN</footer>
 
   <button class="chat-launcher" id="chatLauncher" aria-controls="chatPanel" aria-expanded="false" aria-label="Open chat">
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -249,7 +252,7 @@
   <section class="chat-panel" id="chatPanel" aria-label="Website chat" data-open="false">
     <header class="chat-header">
       <div style="display:flex;align-items:center;gap:12px;">
-        <img src="image-38.png" alt="Gopher avatar" width="44" height="44" style="width:44px;height:44px;border-radius:999px;object-fit:cover;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);box-shadow:0 3px 10px rgba(0,0,0,.12);" loading="lazy">
+        <img src="image-38.png" alt="Gopher avatar" width="44" height="44" style="width:44px;height:44px;border-radius:999px;object-fit:cover;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.22);">
         <div>
           <h2 class="chat-title">Gopher's Estimate Bot</h2>
           <p class="chat-subtitle">Ask for a quick estimate.</p>
@@ -262,7 +265,7 @@
       <div class="chat-row bot">
         <div class="bot-message-wrap">
           <img class="bot-avatar" src="image-28.png" alt="Gopher avatar">
-          <div class="bubble">Hey there! Thanks for choosing Gopher’s! Tell us a little more about your job and we'll give you an estimate!</div>
+          <div class="bubble">Hey there! Thanks for choosing Gopher's! Tell us a little more about your job and we'll give you an estimate!</div>
         </div>
       </div>
     </div>
@@ -271,7 +274,7 @@
       <p class="chat-note">By sending a message, you agree to be contacted about your quote.</p>
       <form class="chat-form" id="chatForm">
         <label class="sr-only" for="chatInput">How can we help ya?</label>
-        <textarea id="chatInput" class="chat-input" rows="1" placeholder="Example: pressure washing, 1,800 sq ft" readonly></textarea>
+        <textarea id="chatInput" class="chat-input" rows="1" placeholder="Example: pressure washing, 1,800 sq ft"></textarea>
         <button class="chat-send" type="submit" aria-label="Send message">Send</button>
       </form>
     </footer>
@@ -300,7 +303,7 @@
     function setOpen(isOpen) {
       chatPanel.dataset.open = String(isOpen);
       chatLauncher.setAttribute('aria-expanded', String(isOpen));
-      chatPanel.classList.toggle('fullscreen', isOpen);
+      chatPanel.classList.toggle('open', isOpen);
       chatLauncher.classList.toggle('hidden', isOpen);
       document.body.style.overflow = isOpen ? 'hidden' : '';
       if (isOpen) setTimeout(() => chatInput.focus(), 50);
@@ -395,46 +398,75 @@
       }
       return data;
     }
-    
-function formatReply(data) {
-  if (!data) return 'Sorry - I could not get a response.';
-  if (typeof data === 'string') return data;
-  if (data.reply) return data.reply;
-  if (data.message) return data.message;
-  if (data.detail) return data.detail;
-  if (data.error) return data.error;
 
-  if (data.status === 'need_more_info') {
-    const fieldList = Array.isArray(data.missing) && data.missing.length ? ` Missing: ${data.missing.join(', ')}.` : '';
-    const hint = data.missing && FIELD_HINTS[data.missing[0]] ? ` ${FIELD_HINTS[data.missing[0]]}` : '';
-    return (data.question || 'I need a little more info.') + fieldList + hint;
-  }
+    function formatReply(data) {
+      if (!data) return 'Sorry - I could not get a response.';
+      if (typeof data === 'string') return data;
+      if (data.reply) return data.reply;
+      if (data.message) return data.message;
+      if (data.detail) return data.detail;
+      if (data.error) return data.error;
 
-  if (data.status === 'complete' && data.estimate) {
-    const e = data.estimate;
-    let msg = `Estimate ready: $${e.low} to $${e.high}.`;
-    if (e.service_label) msg += ` Service: ${e.service_label}.`;
-    if (typeof e.quantity !== 'undefined' && e.unit) msg += ` Amount: ${e.quantity} ${e.unit}.`;
-    msg += ` Labor: $${Number(e.labor ?? 0).toFixed(2)}.`;
-    msg += ` Add-ons: $${Number(e.addons ?? 0).toFixed(2)}.`;
-    msg += ` Final estimate: $${Number(e.final_estimate ?? 0).toFixed(2)}.`;
-    if (e.notes && e.notes.length) {
-      msg += `
-Notes:
-- ${e.notes.join('
-- ')}`;
-    }
-    if (data.sheets_logged !== undefined) msg += `
-Sheets logged: ${data.sheets_logged ? 'yes' : 'no'}.`;
-    if (data.sheets_error) msg += `
-Sheets error: ${data.sheets_error}.`;
-    return msg;
-  }
+      if (data.status === 'need_more_info') {
+        const fieldList = Array.isArray(data.missing) && data.missing.length ? ` Missing: ${data.missing.join(', ')}.` : '';
+        const hint = data.missing && FIELD_HINTS[data.missing[0]] ? ` ${FIELD_HINTS[data.missing[0]]}` : '';
+        return (data.question || 'I need a little more info.') + fieldList + hint;
+      }
 
-  return JSON.stringify(data, null, 2);
+      if (data.status === 'complete' && data.estimate) {
+        const e = data.estimate;
+        let msg = `Estimate ready: $${e.low} to $${e.high}.`;
+        if (e.service_label) msg += ` Service: ${e.service_label}.`;
+        if (typeof e.quantity !== 'undefined' && e.unit) msg += ` Amount: ${e.quantity} ${e.unit}.`;
+        msg += ` Labor: $${Number(e.labor ?? 0).toFixed(2)}.`;
+        msg += ` Add-ons: $${Number(e.addons ?? 0).toFixed(2)}.`;
+        msg += ` Final estimate: $${Number(e.final_estimate ?? 0).toFixed(2)}.`;
+        if (e.notes && e.notes.length) {
+          msg += `\nNotes:\n- ${e.notes.join('\n- ')}`;
         }
-    
+        if (data.sheets_logged !== undefined) msg += `\nSheets logged: ${data.sheets_logged ? 'yes' : 'no'}.`;
+        if (data.sheets_error) msg += `\nSheets error: ${data.sheets_error}.`;
+        return msg;
+      }
+
+      return JSON.stringify(data, null, 2);
+    }
+
+    // Event listeners
+    chatLauncher.addEventListener('click', () => setOpen(true));
+    chatClose.addEventListener('click', () => setOpen(false));
+
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const message = chatInput.value.trim();
+      if (!message) return;
+
+      appendUserMessage(message);
+      chatInput.value = '';
+      chatInput.style.height = 'auto';
+      appendTyping();
+
+      try {
+        const response = await sendToBot(message);
+        removeTyping();
+        const reply = formatReply(response);
+        appendBotMessage(reply);
+      } catch (err) {
+        removeTyping();
+        appendBotMessage(`Error: ${err.message}`);
+      }
+    });
+
+    // Auto-resize textarea
+    chatInput.addEventListener('input', () => {
+      chatInput.style.height = 'auto';
+      chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+    });
+
+    // Set current year in footer
+    document.getElementById('yr').textContent = new Date().getFullYear();
+
   </script>
-                        
+
 </body>
 </html>
