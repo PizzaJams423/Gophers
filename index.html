@@ -418,45 +418,21 @@ function formatReply(data) {
     msg += ` Labor: $${Number(e.labor ?? 0).toFixed(2)}.`;
     msg += ` Add-ons: $${Number(e.addons ?? 0).toFixed(2)}.`;
     msg += ` Final estimate: $${Number(e.final_estimate ?? 0).toFixed(2)}.`;
-   
     if (e.notes && e.notes.length) {
-  msg += `Notes:
-  - ${e.notes.join('
-  - ')}`;
-                 
-                 
-            
-    if (data.sheets_logged !== undefined) msg += `
-Sheets logged: ${data.sheets_logged ? 'yes' : 'no'}
-    if (data.sheets_error) msg += `
-Sheets error: ${data.sheets_error};
-    return msg;
-  }`
-  return JSON.stringify(data, null, 2);
-}
+      msg += `
+Notes:
+- ${e.notes.join('
+- ')}`;
     }
+    if (data.sheets_logged !== undefined) msg += `
+Sheets logged: ${data.sheets_logged ? 'yes' : 'no'}.`;
+    if (data.sheets_error) msg += `
+Sheets error: ${data.sheets_error}.`;
+    return msg;
+  }
 
-    chatLauncher.addEventListener('click', () => setOpen(true));
-    chatClose.addEventListener('click', () => setOpen(false));
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && chatPanel.dataset.open === 'true') setOpen(false); });
-
-    chatForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      const message = chatInput.value.trim();
-      if (!message) return;
-      appendUserMessage(message);
-      chatInput.value = '';
-      appendTyping();
-      try {
-        const data = await sendToBot(message);
-        removeTyping();
-        appendBotMessage(formatReply(data));
-      } catch (err) {
-        removeTyping();
-        appendBotMessage('Sorry - the chat service is temporarily unavailable. Please try again.');
-        console.error(err);
-      }
-    });
+  return JSON.stringify(data, null, 2);
+        }
     
   </script>
                         
