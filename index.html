@@ -310,7 +310,118 @@
     document.getElementById('yr').innerText = new Date().getFullYear();
     renderTabs();
     renderSection();
+  const chatLauncher = document.getElementById('chatLauncher');
+  const chatPanel = document.getElementById('chatPanel');
+  const chatClose = document.getElementById('chatClose');
+  const chatForm = document.getElementById('chatForm');
+  const chatInput = document.getElementById('chatInput');
+  const chatLog = document.getElementById('chatLog');
+  const API_BASE = 'https://gbot-vs3h.onrender.com';
+  const SESSION_KEY = 'gopherbot_session_id';
 
+  function getSessionId() {
+    let id = localStorage.getItem(SESSION_KEY);
+    if (!id) {
+      id = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+      localStorage.setItem(SESSION_KEY, id);
+    }
+    return id;
+  }
+
+  function setOpen(isOpen) {
+    chatPanel.dataset.open = String(isOpen);
+    chatLauncher.setAttribute('aria-expanded', String(isOpen));
+    if (isOpen) {
+      chatPanel.classList.add('fullscreen');
+      chatLauncher.classList.add('hidden');
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => chatInput.focus(), 50);
+    } else {
+      chatPanel.classList.remove('fullscreen');
+      chatLauncher.classList.remove('hidden');
+      document.body.style.overflow = '';
+    }
+  }
+
+  function appendMessage(text, who = 'bot') {
+    const row = document.createElement('div');
+    row.className = `chat-row ${who}`;
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = text;
+    row.appendChild(bubble);
+    chatLog.appendChild(row);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  function appendTyping() {
+    const row = document.createElement('div');
+    row.className = 'chat-row bot';
+    row.id = 'typingRow';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = 'Typing...';
+    row.appendChild(bubble);
+    chatLog.appendChild(row);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  function removeTyping() {
+    const el = document.getElementById('typingRow');
+    if (el) el.remove();
+  }
+
+  async function sendToBot(message) {
+    const res = await fetch(`${API_BASE}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: getSessionId(), text: message })
+    });
+    if (!res.ok) throw new Error('Network error');
+    return await res.json();
+  }
+
+  function formatReply(data) {
+    if (!data) return 'Sorry — I could not get a response.';
+    if (data.status === 'need_more_info') return data.question || 'I need a little more info.';
+    if (data.status === 'complete' && data.estimate) {
+      const e = data.estimate;
+      let msg = `Estimate ready: $${e.low} to $${e.high}.`;
+      if (e.notes && e.notes.length) msg += '
+' + e.notes.join('
+');
+      return msg;
+    }
+    if (data.error) return data.error;
+    return 'Got it.';
+  }
+
+  chatLauncher.addEventListener('click', () => setOpen(chatPanel.dataset.open !== 'true'));
+  chatClose.addEventListener('click', () => setOpen(false));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && chatPanel.dataset.open === 'true') setOpen(false);
+  });
+
+  chatForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const message = chatInput.value.trim();
+    if (!message) return;
+
+    appendMessage(message, 'user');
+    chatInput.value = '';
+    appendTyping();
+
+    try {
+      const data = await sendToBot(message);
+      removeTyping();
+      appendMessage(formatReply(data), 'bot');
+    } catch (err) {
+      removeTyping();
+      appendMessage('Sorry — the chat service is temporarily unavailable. Please try again.', 'bot');
+      console.error(err);
+    }
+  });
     // =========================
     // CHAT WIDGET
     // =========================
