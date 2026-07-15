@@ -427,14 +427,14 @@ function formatReply(data) {
                  
             
     if (data.sheets_logged !== undefined) msg += `
-Sheets logged: ${data.sheets_logged ? 'yes' : 'no'};
+Sheets logged: ${data.sheets_logged ? 'yes' : 'no'}
     if (data.sheets_error) msg += `
-Sheets error: ${data.sheets_error}.`;
+Sheets error: ${data.sheets_error};
     return msg;
-  }
+  }`
   return JSON.stringify(data, null, 2);
 }
-    
+    }
 
     chatLauncher.addEventListener('click', () => setOpen(true));
     chatClose.addEventListener('click', () => setOpen(false));
