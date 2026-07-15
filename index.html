@@ -395,39 +395,42 @@
       }
       return data;
     }
+function formatReply(data) {
+  if (!data) return 'Sorry - I could not get a response.';
+  if (typeof data === 'string') return data;
+  if (data.reply) return data.reply;
+  if (data.message) return data.message;
+  if (data.detail) return data.detail;
+  if (data.error) return data.error;
 
-    function formatReply(data) {
-      if (!data) return 'Sorry â€” I could not get a response.';
-      if (typeof data === 'string') return data;
-      if (data.reply) return data.reply;
-      if (data.message) return data.message;
-      if (data.detail) return data.detail;
-      if (data.error) return data.error;
-      if (data.status === 'need_more_info') {
-        const fieldList = Array.isArray(data.missing) && data.missing.length ? ` Missing: ${data.missing.join(', ')}.` : '';
-        const hint = data.missing && FIELD_HINTS[data.missing[0]] ? ` ${FIELD_HINTS[data.missing[0]]}` : '';
-        return (data.question || 'I need a little more info.') + fieldList + hint;
-      }
-      if (data.status === 'complete' && data.estimate) {
-        const e = data.estimate;
-        let msg = `Estimate ready: $${e.low} to $${e.high}.`;
-        if (e.service_label) msg += ` Service: ${e.service_label}.`;
-        if (typeof e.quantity !== 'undefined' && e.unit) msg += ` Amount: ${e.quantity} ${e.unit}.`;
-        msg += ` Labor: $${Number(e.labor ?? 0).toFixed(2)}.`;
-        msg += ` Add-ons: $${Number(e.addons ?? 0).toFixed(2)}.`;
-        msg += ` Final estimate: $${Number(e.final_estimate ?? 0).toFixed(2)}.`;
-        if (e.notes && e.notes.length) msg += '
+  if (data.status === 'need_more_info') {
+    const fieldList = Array.isArray(data.missing) && data.missing.length ? ` Missing: ${data.missing.join(', ')}.` : '';
+    const hint = data.missing && FIELD_HINTS[data.missing[0]] ? ` ${FIELD_HINTS[data.missing[0]]}` : '';
+    return (data.question || 'I need a little more info.') + fieldList + hint;
+  }
+
+  if (data.status === 'complete' && data.estimate) {
+    const e = data.estimate;
+    let msg = `Estimate ready: $${e.low} to $${e.high}.`;
+    if (e.service_label) msg += ` Service: ${e.service_label}.`;
+    if (typeof e.quantity !== 'undefined' && e.unit) msg += ` Amount: ${e.quantity} ${e.unit}.`;
+    msg += ` Labor: $${Number(e.labor ?? 0).toFixed(2)}.`;
+    msg += ` Add-ons: $${Number(e.addons ?? 0).toFixed(2)}.`;
+    msg += ` Final estimate: $${Number(e.final_estimate ?? 0).toFixed(2)}.`;
+    if (e.notes && e.notes.length) msg += `
 Notes:
-- ' + e.notes.join('
-- ');
-        if (data.sheets_logged !== undefined) msg += `
+- ${e.notes.join('
+- ')}`;
+    if (data.sheets_logged !== undefined) msg += `
 Sheets logged: ${data.sheets_logged ? 'yes' : 'no'}.`;
-        if (data.sheets_error) msg += `
+    if (data.sheets_error) msg += `
 Sheets error: ${data.sheets_error}.`;
-        return msg;
-      }
-      return JSON.stringify(data, null, 2);
-    }
+    return msg;
+  }
+
+  return JSON.stringify(data, null, 2);
+}
+    
 
     chatLauncher.addEventListener('click', () => setOpen(true));
     chatClose.addEventListener('click', () => setOpen(false));
