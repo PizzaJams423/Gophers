@@ -422,12 +422,12 @@ function formatReply(data) {
     if (e.notes && e.notes.length) {
   msg += `Notes:
   - ${e.notes.join('
-                                 - ')}`;
+  - ')}`;
                  
-                 }
+                 
             
     if (data.sheets_logged !== undefined) msg += `
-Sheets logged: ${data.sheets_logged ? 'yes' : 'no'}.`;
+Sheets logged: ${data.sheets_logged ? 'yes' : 'no'};
     if (data.sheets_error) msg += `
 Sheets error: ${data.sheets_error}.`;
     return msg;
@@ -453,7 +453,7 @@ Sheets error: ${data.sheets_error}.`;
         appendBotMessage(formatReply(data));
       } catch (err) {
         removeTyping();
-        appendBotMessage('Sorry â€” the chat service is temporarily unavailable. Please try again.');
+        appendBotMessage('Sorry - the chat service is temporarily unavailable. Please try again.');
         console.error(err);
       }
     });
