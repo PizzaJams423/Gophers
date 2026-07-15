@@ -420,10 +420,8 @@ function formatReply(data) {
     msg += ` Final estimate: $${Number(e.final_estimate ?? 0).toFixed(2)}.`;
    
     if (e.notes && e.notes.length) {
-  msg += `
-Notes:
-- ${e.notes.join('
-- ')}`;
+  msg += `Notes:- ${e.notes.join('- ')}`;
+                 
                  }
             
     if (data.sheets_logged !== undefined) msg += `
