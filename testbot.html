@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gopher’s Handyman Service</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    html, body { background: #fff7ed; }
+    :root { --gopher-footer-offset: 0px; --chat-z: 99999; }
+    .fade-in { opacity: 0; transition: opacity .35s ease-in; }
+    .fade-in.show { opacity: 1; }
+    .tab { border-radius: 1rem; padding: .5rem .75rem; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+    .tab.active { background: #f59e0b; color: #fff; }
+    .tab.inactive { background: #fff; }
+    .tab.inactive:hover { background: #fffbeb; }
+    .card { background: #fff; border-radius: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+    .chat-launcher, .chat-panel, .chat-panel * { box-sizing: border-box; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .chat-launcher {
+      position: fixed;
+      right: 20px;
+      bottom: calc(var(--gopher-footer-offset, 0px) + 20px);
+      width: 64px;
+      height: 64px;
+      border: 0;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #f59e0b, #fbbf24);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 16px 34px rgba(245,158,11,.34);
+      cursor: pointer;
+      z-index: var(--chat-z);
+      transition: transform 180ms ease, box-shadow 180ms ease;
+      pointer-events: auto;
+    }
+    .chat-launcher:hover { transform: translateY(-1px); box-shadow: 0 18px 38px rgba(245,158,11,.38); }
+    .chat-launcher:focus-visible, .chat-close:focus-visible, .chat-send:focus-visible, .chat-input:focus-visible {
+      outline: 3px solid rgba(245,158,11,.30);
+      outline-offset: 3px;
+    }
+    .chat-panel {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #fffaf1;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      z-index: var(--chat-z);
+    }
+    .chat-panel[data-open="true"] { display: flex; }
+    .chat-header {
+      background: linear-gradient(135deg, #b45309, #f59e0b);
+      color: #fff;
+      padding: 18px 18px 16px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      flex: 0 0 auto;
+    }
+    .chat-title {
+      margin: 0;
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 1.16rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .chat-subtitle {
+      margin: 6px 0 0;
+      font-size: .92rem;
+      line-height: 1.45;
+      color: rgba(255,255,255,.9);
+    }
+    .chat-close {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.22);
+      background: rgba(255,255,255,.12);
+      color: #fff;
+      cursor: pointer;
+      flex: 0 0 auto;
+    }
+    .chat-body {
+      flex: 1;
+      overflow: auto;
+      padding: 16px;
+      background: linear-gradient(180deg, #fffdf8 0%, #fff7ed 100%);
+    }
+    .chat-row { display: flex; margin-bottom: 12px; }
+    .chat-row.bot { justify-content: flex-start; }
+    .chat-row.user { justify-content: flex-end; }
+    .bot-message-wrap { display: flex; align-items: flex-start; max-width: 84%; }
+    .bot-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      object-fit: cover;
+      flex: 0 0 auto;
+      margin-right: 10px;
+      margin-top: 2px;
+    }
+    .bubble {
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-size: .96rem;
+      line-height: 1.58;
+      white-space: pre-wrap;
+    }
+    .bot .bubble {
+      background: #fffbeb;
+      border: 1px solid rgba(245,158,11,.12);
+      color: #292524;
+      border-bottom-left-radius: 6px;
+    }
+    .user .bubble {
+      background: #f59e0b;
+      color: #fff;
+      border-bottom-right-radius: 6px;
+      max-width: 84%;
+    }
+    .chat-footer {
+      border-top: 1px solid rgba(245,158,11,.12);
+      padding: 12px;
+      background: #fff;
+      flex: 0 0 auto;
+    }
+    .chat-note { font-size: .76rem; color: #57534e; margin: 0 0 10px; }
+    .chat-form { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; }
+    .chat-input {
+      width: 100%;
+      min-height: 48px;
+      max-height: 120px;
+      resize: vertical;
+      border: 1px solid rgba(245,158,11,.18);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font: inherit;
+      color: #292524;
+      background: #fff;
+    }
+    .chat-send {
+      min-width: 52px;
+      height: 48px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 14px;
+      background: #f59e0b;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+    @media (max-width: 640px) {
+      .chat-launcher {
+        right: 16px;
+        bottom: calc(var(--gopher-footer-offset, 0px) + 16px);
+        width: 60px;
+        height: 60px;
+      }
+      .chat-panel { inset: 0; width: 100vw; height: 100vh; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .chat-launcher, .chat-panel, .chat-panel * { transition: none !important; scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body class="text-stone-900">
+  <div id="bottomCTA" class="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-white/95 backdrop-blur border-t border-stone-200 shadow-[0_-2px_10px_rgba(0,0,0,0.08)]">
+    <div class="grid grid-cols-2 gap-2 p-3">
+      <a href="tel:+14238882856" class="flex items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-white font-semibold shadow active:scale-[0.99]" aria-label="Call Gopher at 423-888-2856">Call</a>
+      <a href="sms:+14238882856?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate." class="flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-white font-semibold shadow active:scale-[0.99]" aria-label="Text Gopher for an estimate">Text</a>
+    </div>
+  </div>
+
+  <header class="sticky top-0 z-40 bg-amber-100/80 backdrop-blur border-b border-amber-200">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
+      <img id="logoImg" class="h-10 w-auto rounded" alt="Gopher's logo">
+      <div class="font-extrabold text-xl">Gopher’s Handyman Service</div>
+      <div class="ml-auto text-sm text-stone-600 hidden sm:block">Chattanooga + 15 mi • Text/Call: (423) 888-2856</div>
+    </div>
+  </header>
+
+  <nav id="tabBar" class="max-w-6xl mx-auto px-2 pt-3 grid grid-cols-2 sm:grid-cols-5 gap-2"></nav>
+  <main id="sectionArea" class="max-w-6xl mx-auto px-4 py-6 pb-24 sm:pb-6"></main>
+
+  <section class="max-w-6xl mx-auto px-4 py-4">
+    <div class="card p-4">
+      <div class="w-full flex items-center justify-center mb-3">
+        <img src="file_0000000033c061f58a296450d1d6f625.png" alt="Virtual Estimates Coming Soon!" class="max-h-40 sm:max-h-48 w-auto fade-in" onload="this.classList.add('show')">
+      </div>
+      <div class="flex flex-wrap gap-2 justify-end">
+        <a id="smsLink" href="sms:+14238882856?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate." class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow">Text Gopher</a>
+        <a id="callLink" href="tel:+14238882856" class="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow">Call Gopher</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="text-center text-sm text-stone-600 py-8">© <span id="yr"></span> Gopher’s Handyman Service — Chattanooga, TN</footer>
+
+  <button class="chat-launcher" id="chatLauncher" aria-controls="chatPanel" aria-expanded="false" aria-label="Open chat">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 10h8M8 14h5m-7 6 1.6-3.2A8 8 0 1 1 20 12a8 8 0 0 1-8 8H6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+
+  <section class="chat-panel" id="chatPanel" aria-label="Website chat" data-open="false">
+    <header class="chat-header">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <img src="image-38.png" alt="Gopher avatar" width="44" height="44" style="width:44px;height:44px;border-radius:999px;object-fit:cover;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);box-shadow:0 3px 10px rgba(0,0,0,.12);" loading="lazy">
+        <div><h2 class="chat-title">Gopher's Estimate Bot</h2><p class="chat-subtitle">Ask for a quick estimate.</p></div>
+      </div>
+      <button class="chat-close" id="chatClose" aria-label="Close chat">✕</button>
+    </header>
+
+    <div class="chat-body" id="chatLog" role="log" aria-live="polite" aria-relevant="additions text">
+      <div class="chat-row bot">
+        <div class="bot-message-wrap">
+          <img class="bot-avatar" src="image-28.png" alt="Gopher avatar">
+          <div class="bubble">Hey there! Thanks for choosing Gopher’s! Tell us a little more about your job and we'll give you an estimate!</div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="chat-footer">
+      <p class="chat-note">By sending a message, you agree to be contacted about your quote.</p>
+      <form class="chat-form" id="chatForm">
+        <label class="sr-only" for="chatInput">How can we help ya?</label>
+        <textarea id="chatInput" class="chat-input" rows="1" placeholder="Example: pressure washing, 1,800 sq ft" readonly></textarea>
+        <button class="chat-send" type="submit" aria-label="Send message">Send</button>
+      </form>
+    </footer>
+  </section>
+
+  <script>
+    const IMG = {
+      logo: 'image-38.png',
+      general: 'file_00000000e0d46230b0cb3139ec953033.png',
+      lawn: 'file_00000000061c62309954b4094aabf893.png',
+      mechanic: 'file_000000003f2c61f79ffc24f1fbb273a2.png',
+      builds: 'file_00000000fd506230a50b8dc7dfefb9da.png',
+      joblog: 'Goodgoph.png'
+    };
+
+    const SERVICES = [
+      {
+        key:'general',
+        title:'General Maintenance',
+        hero:IMG.general,
+        list:[
+          'Doors: hinge/strike adjustments, latch/lock installs, weatherstripping, thresholds',
+          'Drywall & Paint: patch holes, texture match, prime/paint walls & trim',
+          'Light Plumbing: faucets, traps, supply lines, toilets (fill/flush valves, wax rings), disposals, caulking',
+          'Light Electrical: fixtures, fans, switches, dimmers, outlets/GFCI, doorbells (low‑voltage)',
+          'Carpentry: baseboards/trim, shelving, closet systems, cabinet hardware, minor framing repairs',
+          'Flooring (small scope): tile pop‑outs & grout repair, LVP/laminate board swaps',
+          'Mount/Install: TVs (wire‑conceal add‑on), blinds, curtain rods, mirrors, pictures',
+          'Assembly: furniture, storage racks, prefab units',
+          'Window cleaning (interior/exterior; screens & sills)',
+          'Basic pest control (ants/roaches; wasp nest removal where safe — no termites)'
+        ]
+      },
+      {
+        key:'lawn',
+        title:'Lawn & Outdoor',
+        hero:IMG.lawn,
+        list:[
+          'Trimming/weed‑eating & edging; hedge/bush shaping',
+          'Flowerbeds: design/build, edging, soil amending, mulch install',
+          'Planters & Raised Beds: build/install, fill soil mix, placement',
+          'Garden prep: bed turning, compost/topsoil mix, basic drip/soaker setup',
+          'Cleanup: leaf/brush cleanup (light), haul‑off',
+          'Gutter cleaning (single story)',
+          'Power washing: siding, decks, patios, driveways',
+          'Holiday lights: hanging/removal'
+        ]
+      },
+      {
+        key:'mechanic',
+        title:'Mobile Mechanic (Basic to Light Service)',
+        hero:IMG.mechanic,
+        list:[
+          'Battery swap / jump start',
+          'Flat repair / air (where safe), spare changeover',
+          'Wiper & bulb replacement, fluid top‑offs, OBD‑II code read',
+          'Brake jobs (pads / rotors, inspection)',
+          'Oil changes (standard or synthetic; includes filter)',
+          'Spark plug replacement',
+          'Tune‑ups (filters, plugs, belts, fluids)',
+          'Stereo/radio installs & subwoofer wiring'
+        ]
+      },
+      {
+        key:'builds',
+        title:'Builds & Construction',
+        hero:IMG.builds,
+        list:[
+          'Porches & small decks — new builds, resurfacing, railings, stairs, skirting, lattice',
+          'Patios (pavers/stone) — base prep, compaction, edging, polymeric sand finish',
+          'Walkways (gravel/paver/stepping stone) — layout, base, edging',
+          'Fencing & gates — wood repairs, small new runs, custom gates, hardware',
+          'Sheds & pergolas — small shed builds, prefab assembly, pergolas/awnings',
+          'Exterior carpentry — fascia/soffit patches, door/sill replacement, trim',
+          'Small interior upgrades — vanity swaps, backsplash installs, accent walls, wainscoting',
+          'Tile & bathroom remodels — surrounds, grout & waterproofing, small bath refreshes',
+          'Concrete (minor) — step patches, small pads/leveling'
+        ]
+      },
+      {
+        key:'membership',
+        title:'Membership Plans',
+        hero:IMG.logo,
+        list:[
+          'Gopher Basic — $99/mo • 3 hours • 10% off extra ($36/hr) • 48‑hr priority • roll over 2 months',
+          'Gopher Plus — $199/mo • 6 hours • 15% off extra ($34/hr) • same‑week priority • quarterly perk • roll over 3 months',
+          'Gopher Gold — $349/mo • 10 hours • 20% off extra ($32/hr) • guaranteed slot • free emergency or mobile mechanic service / mo • free travel up to 25mi',
+          'Materials billed separately (+25% when Gopher’s supplies). Cancel anytime.'
+        ]
+      },
+      {
+        key:'oldproj',
+        title:'Project Gallery',
+        hero:IMG.joblog,
+        list:['Prior Projects']
+      }
+    ];
+
+    let active = 'general';
+    const $ = s => document.querySelector(s);
+    const $$ = s => document.querySelectorAll(s);
+
+    function renderTabs() {
+      const bar = $('#tabBar');
+      bar.innerHTML = SERVICES.map(s => `<button class="tab ${active===s.key?'active':'inactive'}" data-tab="${s.key}">${s.title}</button>`).join('');
+      $$('#tabBar .tab').forEach(btn => btn.onclick = () => { active = btn.dataset.tab; renderSection(); renderTabs(); });
+    }
+
+    function renderSection() {
+      const sec = $('#sectionArea');
+      const group = SERVICES.find(s => s.key===active);
+
+      if (active === 'oldproj') {
+        sec.innerHTML = `
+          <div class="flex flex-col space-y-6">
+            <div class="card overflow-hidden">
+              <div class="w-full h-64 sm:h-80 bg-amber-50 flex items-center justify-center">
+                <img src="${group.hero}" alt="${group.title}" class="max-h-full w-auto object-contain fade-in" onload="this.classList.add('show')">
+              </div>
+              <div class="p-4 sm:p-6 space-y-6">
+                <div class="card p-4 sm:p-6 border border-stone-200">
+                  <div class="bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-lg mb-4">LVP, Countertops, and Paint</div>
+                  <div class="grid grid-cols-2 gap-4 mb-4 text-center">
+                    <div class="font-bold text-stone-700">Before</div>
+                    <div class="font-bold text-stone-700">After</div>
+                  </div>
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clarklvpb4.jpg" alt="Before: LVP, countertops, and paint project" class="w-full h-full object-cover"></div>
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clark-lvp.webp" alt="After: LVP, countertops, and paint project" class="w-full h-full object-cover"></div>
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="ClarkKitb4.jpg" alt="Before: LVP, countertops, and paint project" class="w-full h-full object-cover"></div>
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clark_kit.webp" alt="After: LVP, countertops, and paint project" class="w-full h-full object-cover"></div>
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="ClarkdiningB4.jpg" alt="Before: LVP, countertops, and paint project" class="w-full h-full object-cover"></div>
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clark_dining.webp" alt="After: LVP, countertops, and paint project" class="w-full h-full object-cover"></div>
+                  </div>
+                </div>
+                <div class="card p-4 sm:p-6 border border-stone-200">
+                  <div class="bg-amber-400 text-stone-900 text-sm font-semibold px-4 py-2 rounded-lg mb-4">Bathroom Remodel</div>
+                  <div class="grid grid-cols-2 gap-4 mb-4 text-center">
+                    <div class="font-bold text-stone-700">Before</div>
+                    <div class="font-bold text-stone-700">After</div>
+                  </div>
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="bathroombef1.jpg" alt="Before: bathroom remodel" class="w-full h-full object-cover"></div>
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="bathroomaft1.webp" alt="After: bathroom remodel" class="w-full h-full object-cover"></div>
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="bathroombef2.jpg" alt="Before: bathroom remodel" class="w-full h-full object-cover"></div>
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="bathroomaft2.webp" alt="After: bathroom remodel" class="w-full h-full object-cover"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>`;
+        return;
+      }
+
+      sec.innerHTML = `
+        <div class="card overflow-hidden">
+          <div class="w-full h-64 sm:h-80 bg-amber-50 flex items-center justify-center">
+            <img src="${group.hero}" alt="${group.title}" class="max-h-full w-auto object-contain fade-in" onload="this.classList.add('show')">
+          </div>
+          <div class="p-4 sm:p-6">
+            <h2 class="text-2xl font-extrabold mb-2">${group.title}</h2>
+            <ul class="list-disc pl-5 space-y-1">${group.list.map(item => `<li>${item}</li>`).join('')}</ul>
+          </div>
+        </div>`;
+    }
+
+    document.getElementById('logoImg').src = IMG.logo;
+    document.getElementById('yr').innerText = new Date().getFullYear();
+    renderTabs();
+    renderSection();
+
+    const chatLauncher = document.getElementById('chatLauncher');
+    const chatPanel = document.getElementById('chatPanel');
+    const chatClose = document.getElementById('chatClose');
+    const chatForm = document.getElementById('chatForm');
+    const chatInput = document.getElementById('chatInput');
+    const chatLog = document.getElementById('chatLog');
+    let lastFocus = null;
+    const bottomBarId = 'bottomCTA';
+    const gap = 12;
+    const chatHistory = [];
+    const CHATBOT_SYSTEM_PROMPT = 'You are Gopher, a helpful handyman estimate assistant. Be concise, friendly, and ask clarifying questions when needed. If the user asks for pricing, respond with a helpful estimate style answer, but never invent unavailable facts.';
+
+    function getBottomBarHeight() {
+      const bar = document.getElementById(bottomBarId);
+      if (!bar) return 0;
+      const rect = bar.getBoundingClientRect();
+      return rect.height || bar.offsetHeight || 0;
+    }
+
+    function updateFooterOffset() {
+      document.documentElement.style.setProperty('--gopher-footer-offset', `${getBottomBarHeight()}px`);
+    }
+
+    function setWidgetPosition(right, bottom) {
+      chatLauncher.style.right = `${right}px`;
+      chatLauncher.style.bottom = `${bottom}px`;
+    }
+
+    function positionAboveBottomBar() {
+      updateFooterOffset();
+      const barHeight = getBottomBarHeight();
+      setWidgetPosition(20, Math.max(gap, barHeight + gap + 8));
+    }
+
+    function setOpen(isOpen) {
+      chatPanel.dataset.open = String(isOpen);
+      chatLauncher.setAttribute('aria-expanded', String(isOpen));
+      if (isOpen) {
+        lastFocus = document.activeElement;
+      } else if (lastFocus) {
+        lastFocus.focus();
+      }
+    }
+
+    function appendUserMessage(text) {
+      chatHistory.push({ role: 'user', content: text });
+      const row = document.createElement('div');
+      row.className = 'chat-row user';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = text;
+      row.appendChild(bubble);
+      chatLog.appendChild(row);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    function appendBotMessage(text) {
+      chatHistory.push({ role: 'assistant', content: text });
+      const row = document.createElement('div');
+      row.className = 'chat-row bot';
+      const wrap = document.createElement('div');
+      wrap.className = 'bot-message-wrap';
+      const avatar = document.createElement('img');
+      avatar.className = 'bot-avatar';
+      avatar.src = 'image-28.png';
+      avatar.alt = 'Gopher avatar';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = text;
+      wrap.appendChild(avatar);
+      wrap.appendChild(bubble);
+      row.appendChild(wrap);
+      chatLog.appendChild(row);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    chatInput.addEventListener('focus', () => {
+      chatInput.removeAttribute('readonly');
+    });
+
+    chatLauncher.addEventListener('click', () => {
+      setOpen(chatPanel.dataset.open !== 'true');
+    });
+
+    chatClose.addEventListener('click', () => setOpen(false));
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && chatPanel.dataset.open === 'true') {
+        setOpen(false);
+      }
+    });
+
+    const CHATBOT_API_URL = '/api/chat';
+
+    async function getReply(message) {
+      const response = await fetch(CHATBOT_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, systemPrompt: CHATBOT_SYSTEM_PROMPT, history: chatHistory })
+      });
+
+      if (!response.ok) {
+        throw new Error('Chatbot request failed.');
+      }
+
+      const data = await response.json();
+      return data.reply || 'Sorry, I could not generate a reply just now.';
+    }
+
+    positionAboveBottomBar();
+    window.addEventListener('resize', positionAboveBottomBar);
+    window.addEventListener('load', positionAboveBottomBar);
+
+    chatForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      const message = chatInput.value.trim();
+      if (!message) return;
+
+      appendUserMessage(message);
+      chatInput.value = '';
+
+      try {
+        const reply = await getReply(message);
+        appendBotMessage(reply);
+      } catch (error) {
+        appendBotMessage('Sorry — the chat service is temporarily unavailable. Please try again or text Gopher directly.');
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>
