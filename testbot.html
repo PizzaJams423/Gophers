@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" interactive-widget=resizes-content">/>
-  <title>Gopher’s Handyman Service</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
+  <title>Gopher's Handyman Service</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -56,10 +56,6 @@
       display: none;
       flex-direction: column;
       z-index: var(--chat-z);
-      height: min(620px, calc(100dvh - 120px));
-}
-@media (max-width: 640px) 
-
     }
     .chat-panel[data-open="true"] { display: flex; }
     .chat-header {
@@ -183,15 +179,7 @@
         height: 60px;
       }
       .chat-panel { inset: 0; width: 100vw; height: 100vh; }
-       <footer class="chat-footer">
-      <p class="chat-note">By sending a message, you agree to be contacted about your quote.</p>
-      <form class="chat-form" id="chatForm">
-        <label class="sr-only" for="chatInput">How can we help ya?</label>
-        <textarea id="chatInput" class="chat-input" rows="1" placeholder="Example: pressure washing, 1,800 sq ft" readonly></textarea>
-        <button class="chat-send" type="submit" aria-label="Send message">Send</button>
-      </form>
-    </footer>
-      }
+    }
     @media (prefers-reduced-motion: reduce) {
       .chat-launcher, .chat-panel, .chat-panel * { transition: none !important; scroll-behavior: auto; }
     }
@@ -200,15 +188,15 @@
 <body class="text-stone-900">
   <div id="bottomCTA" class="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-white/95 backdrop-blur border-t border-stone-200 shadow-[0_-2px_10px_rgba(0,0,0,0.08)]">
     <div class="grid grid-cols-2 gap-2 p-3">
-      <a href="tel:+14238882856" class="flex items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-white font-semibold shadow active:scale-[0.99]" aria-label="Call Gopher at 423-888-2856">Call</a>
-      <a href="sms:+14238882856?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate." class="flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-white font-semibold shadow active:scale-[0.99]" aria-label="Text Gopher for an estimate">Text</a>
+      <a href="tel:+14238882856" class="flex items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-white font-semibold shadow active:scale-[0.99]" aria-label="Call Gopher at 423-888-2856">[...]
+      <a href="sms:+14238882856?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate." class="flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-white font-semibol[...]
     </div>
   </div>
 
   <header class="sticky top-0 z-40 bg-amber-100/80 backdrop-blur border-b border-amber-200">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
       <img id="logoImg" class="h-10 w-auto rounded" alt="Gopher's logo">
-      <div class="font-extrabold text-xl">Gopher’s Handyman Service</div>
+      <div class="font-extrabold text-xl">Gopher's Handyman Service</div>
       <div class="ml-auto text-sm text-stone-600 hidden sm:block">Chattanooga + 15 mi • Text/Call: (423) 888-2856</div>
     </div>
   </header>
@@ -222,22 +210,22 @@
         <img src="file_0000000033c061f58a296450d1d6f625.png" alt="Virtual Estimates Coming Soon!" class="max-h-40 sm:max-h-48 w-auto fade-in" onload="this.classList.add('show')">
       </div>
       <div class="flex flex-wrap gap-2 justify-end">
-        <a id="smsLink" href="sms:+14238882856?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate." class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow">Text Gopher</a>
+        <a id="smsLink" href="sms:+14238882856?&body=Hi%20Gopher%E2%80%99s%2C%20I%27d%20like%20an%20estimate." class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semi[...]
         <a id="callLink" href="tel:+14238882856" class="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow">Call Gopher</a>
       </div>
     </div>
   </section>
 
-  <footer class="text-center text-sm text-stone-600 py-8">© <span id="yr"></span> Gopher’s Handyman Service — Chattanooga, TN</footer>
+  <footer class="text-center text-sm text-stone-600 py-8">© <span id="yr"></span> Gopher's Handyman Service — Chattanooga, TN</footer>
 
   <button class="chat-launcher" id="chatLauncher" aria-controls="chatPanel" aria-expanded="false" aria-label="Open chat">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 10h8M8 14h5m-7 6 1.6-3.2A8 8 0 1 1 20 12a8 8 0 0 1-8 8H6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 10h8M8 14h5m-7 6 1.6-3.2A8 8 0 1 1 20 12a8 8 0 0 1-8 8H6Z" stroke="currentColor" stroke-width="2" st[...]
   </button>
 
   <section class="chat-panel" id="chatPanel" aria-label="Website chat" data-open="false">
     <header class="chat-header">
       <div style="display:flex;align-items:center;gap:12px;">
-        <img src="image-38.png" alt="Gopher avatar" width="44" height="44" style="width:44px;height:44px;border-radius:999px;object-fit:cover;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);box-shadow:0 3px 10px rgba(0,0,0,.12);" loading="lazy">
+        <img src="image-38.png" alt="Gopher avatar" width="44" height="44" style="width:44px;height:44px;border-radius:999px;object-fit:cover;background:rgba(255,255,255,.18);border:1px solid rgb[...]
         <div><h2 class="chat-title">Gopher's Estimate Bot</h2><p class="chat-subtitle">Ask for a quick estimate.</p></div>
       </div>
       <button class="chat-close" id="chatClose" aria-label="Close chat">✕</button>
@@ -247,12 +235,19 @@
       <div class="chat-row bot">
         <div class="bot-message-wrap">
           <img class="bot-avatar" src="image-28.png" alt="Gopher avatar">
-          <div class="bubble">Hey there! Thanks for choosing Gopher’s! Tell us a little more about your job and we'll give you an estimate!</div>
+          <div class="bubble">Hey there! Thanks for choosing Gopher's! Tell us a little more about your job and we'll give you an estimate!</div>
         </div>
       </div>
     </div>
 
-    
+    <footer class="chat-footer">
+      <p class="chat-note">By sending a message, you agree to be contacted about your quote.</p>
+      <form class="chat-form" id="chatForm">
+        <label class="sr-only" for="chatInput">How can we help ya?</label>
+        <textarea id="chatInput" class="chat-input" rows="1" placeholder="Example: pressure washing, 1,800 sq ft" readonly></textarea>
+        <button class="chat-send" type="submit" aria-label="Send message">Send</button>
+      </form>
+    </footer>
   </section>
 
   <script>
@@ -337,7 +332,7 @@
           'Gopher Basic — $99/mo • 3 hours • 10% off extra ($36/hr) • 48‑hr priority • roll over 2 months',
           'Gopher Plus — $199/mo • 6 hours • 15% off extra ($34/hr) • same‑week priority • quarterly perk • roll over 3 months',
           'Gopher Gold — $349/mo • 10 hours • 20% off extra ($32/hr) • guaranteed slot • free emergency or mobile mechanic service / mo • free travel up to 25mi',
-          'Materials billed separately (+25% when Gopher’s supplies). Cancel anytime.'
+          'Materials billed separately (+25% when Gopher's supplies). Cancel anytime.'
         ]
       },
       {
@@ -377,12 +372,12 @@
                     <div class="font-bold text-stone-700">After</div>
                   </div>
                   <div class="grid grid-cols-2 gap-4">
-                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clarklvpb4.jpg" alt="Before: LVP, countertops, and paint project" class="w-full h-full object-cover"></div>
-                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clark-lvp.webp" alt="After: LVP, countertops, and paint project" class="w-full h-full object-cover"></div>
-                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="ClarkKitb4.jpg" alt="Before: LVP, countertops, and paint project" class="w-full h-full object-cover"></div>
-                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clark_kit.webp" alt="After: LVP, countertops, and paint project" class="w-full h-full object-cover"></div>
-                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="ClarkdiningB4.jpg" alt="Before: LVP, countertops, and paint project" class="w-full h-full object-cover"></div>
-                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clark_dining.webp" alt="After: LVP, countertops, and paint project" class="w-full h-full object-cover"></div>
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clarklvpb4.jpg" alt="Before: LVP, countertops, and paint project" class="w-full h-full object-cover[...]
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clark-lvp.webp" alt="After: LVP, countertops, and paint project" class="w-full h-full object-cover"[...]
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="ClarkKitb4.jpg" alt="Before: LVP, countertops, and paint project" class="w-full h-full object-cover[...]
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clark_kit.webp" alt="After: LVP, countertops, and paint project" class="w-full h-full object-cover"[...]
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="ClarkdiningB4.jpg" alt="Before: LVP, countertops, and paint project" class="w-full h-full object-co[...]
+                    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"><img src="Clark_dining.webp" alt="After: LVP, countertops, and paint project" class="w-full h-full object-cov[...]
                   </div>
                 </div>
                 <div class="card p-4 sm:p-6 border border-stone-200">
@@ -431,7 +426,7 @@
     const bottomBarId = 'bottomCTA';
     const gap = 12;
     const chatHistory = [];
-    const CHATBOT_SYSTEM_PROMPT = 'You are Gopher, a helpful handyman estimate assistant. Be concise, friendly, and ask clarifying questions when needed. If the user asks for pricing, respond with a helpful estimate style answer, but never invent unavailable facts.';
+    const CHATBOT_SYSTEM_PROMPT = 'You are Gopher, a helpful handyman estimate assistant. Be concise, friendly, and ask clarifying questions when needed. If the user asks for pricing, respond wit[...]
 
     function getBottomBarHeight() {
       const bar = document.getElementById(bottomBarId);
@@ -460,6 +455,7 @@
       chatLauncher.setAttribute('aria-expanded', String(isOpen));
       if (isOpen) {
         lastFocus = document.activeElement;
+        chatInput.focus();
       } else if (lastFocus) {
         lastFocus.focus();
       }
