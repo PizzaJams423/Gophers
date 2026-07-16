@@ -183,7 +183,15 @@
         height: 60px;
       }
       .chat-panel { inset: 0; width: 100vw; height: 100vh; }
-    }
+       <footer class="chat-footer">
+      <p class="chat-note">By sending a message, you agree to be contacted about your quote.</p>
+      <form class="chat-form" id="chatForm">
+        <label class="sr-only" for="chatInput">How can we help ya?</label>
+        <textarea id="chatInput" class="chat-input" rows="1" placeholder="Example: pressure washing, 1,800 sq ft" readonly></textarea>
+        <button class="chat-send" type="submit" aria-label="Send message">Send</button>
+      </form>
+    </footer>
+      }
     @media (prefers-reduced-motion: reduce) {
       .chat-launcher, .chat-panel, .chat-panel * { transition: none !important; scroll-behavior: auto; }
     }
@@ -244,14 +252,7 @@
       </div>
     </div>
 
-    <footer class="chat-footer">
-      <p class="chat-note">By sending a message, you agree to be contacted about your quote.</p>
-      <form class="chat-form" id="chatForm">
-        <label class="sr-only" for="chatInput">How can we help ya?</label>
-        <textarea id="chatInput" class="chat-input" rows="1" placeholder="Example: pressure washing, 1,800 sq ft" readonly></textarea>
-        <button class="chat-send" type="submit" aria-label="Send message">Send</button>
-      </form>
-    </footer>
+    
   </section>
 
   <script>
