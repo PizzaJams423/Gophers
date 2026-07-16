@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" interactive-widget=resizes-content">/>
   <title>Gopher’s Handyman Service</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -56,6 +56,10 @@
       display: none;
       flex-direction: column;
       z-index: var(--chat-z);
+      height: min(620px, calc(100dvh - 120px));
+}
+@media (max-width: 640px) 
+
     }
     .chat-panel[data-open="true"] { display: flex; }
     .chat-header {
