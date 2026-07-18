@@ -322,7 +322,7 @@
     function positionAboveBottomBar() {
       updateFooterOffset();
       const barHeight = getBottomBarHeight();
-      setWidgetPosition(20, Math.max(gap, barHeight + gap + 8));
+      setWidgetPosition(window.innerWidth <= 640 ? 16 : 20, Math.max(gap, barHeight + gap + 8));
     }
 
     function setOpen(isOpen) {
@@ -336,6 +336,10 @@
       }
     }
 
+    function scrollChatToBottom() {
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
     function appendUserMessage(text) {
       const row = document.createElement('div');
       row.className = 'chat-row user';
@@ -344,7 +348,7 @@
       bubble.textContent = text;
       row.appendChild(bubble);
       chatLog.appendChild(row);
-      chatLog.scrollTop = chatLog.scrollHeight;
+      scrollChatToBottom();
     }
 
     function appendBotMessage(text) {
@@ -363,25 +367,29 @@
       wrap.appendChild(bubble);
       row.appendChild(wrap);
       chatLog.appendChild(row);
-      chatLog.scrollTop = chatLog.scrollHeight;
+      scrollChatToBottom();
+    }
+
+    async function getReply(message) {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.reply || 'Chatbot request failed.');
+      }
+      return data.reply || 'Sorry, I could not generate a reply just now.';
     }
 
     chatInput.addEventListener('focus', () => chatInput.removeAttribute('readonly'));
     chatLauncher.addEventListener('click', () => setOpen(chatPanel.dataset.open !== 'true'));
     chatClose.addEventListener('click', () => setOpen(false));
-    document.addEventListener('keydown', event => { if (event.key === 'Escape' && chatPanel.dataset.open === 'true') setOpen(false); });
-
-    const CHATBOT_API_URL = '/api/chat';
-    async function getReply(message) {
-      const response = await fetch(CHATBOT_API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message })
-      });
-      if (!response.ok) throw new Error('Chatbot request failed.');
-      const data = await response.json();
-      return data.reply || 'Sorry, I could not generate a reply just now.';
-    }
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && chatPanel.dataset.open === 'true') setOpen(false);
+    });
 
     positionAboveBottomBar();
     window.addEventListener('resize', positionAboveBottomBar);
@@ -391,14 +399,27 @@
       event.preventDefault();
       const message = chatInput.value.trim();
       if (!message) return;
+
       appendUserMessage(message);
       chatInput.value = '';
+      chatInput.disabled = true;
+
+      const sendButton = chatForm.querySelector('.chat-send');
+      const previousButtonText = sendButton.textContent;
+      sendButton.disabled = true;
+      sendButton.textContent = '...';
+
       try {
         const reply = await getReply(message);
         appendBotMessage(reply);
       } catch (error) {
-        appendBotMessage('Sorry — the chat service is temporarily unavailable. Please try again or text Gopher directly.');
+        appendBotMessage(error.message || 'Sorry — the chat service is temporarily unavailable. Please try again or text Gopher directly.');
         console.error(error);
+      } finally {
+        chatInput.disabled = false;
+        sendButton.disabled = false;
+        sendButton.textContent = previousButtonText;
+        chatInput.focus();
       }
     });
   </script>
