@@ -372,7 +372,7 @@
 
 let conversationHistory = [];
 
-    async function getReply(message, history) {
+async function getReply(message, history) {
   const response = await fetch('/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -388,51 +388,53 @@ let conversationHistory = [];
   return data.reply || 'Sorry, I could not generate a reply just now.';
 }
 
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(data.reply || 'Chatbot request failed.');
-      }
-      return data.reply || 'Sorry, I could not generate a reply just now.';
+chatInput.addEventListener('focus', () => chatInput.removeAttribute('readonly'));
+chatLauncher.addEventListener('click', () => setOpen(chatPanel.dataset.open !== 'true'));
+chatClose.addEventListener('click', () => setOpen(false));
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && chatPanel.dataset.open === 'true') setOpen(false);
+});
+
+positionAboveBottomBar();
+window.addEventListener('resize', positionAboveBottomBar);
+window.addEventListener('load', positionAboveBottomBar);
+
+chatForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  const message = chatInput.value.trim();
+  if (!message) return;
+
+  appendUserMessage(message);
+  chatInput.value = '';
+  chatInput.disabled = true;
+
+  const sendButton = chatForm.querySelector('.chat-send');
+  const previousButtonText = sendButton.textContent;
+  sendButton.disabled = true;
+  sendButton.textContent = '...';
+
+  try {
+    const reply = await getReply(message, conversationHistory);
+    appendBotMessage(reply);
+
+    conversationHistory.push({ role: 'user', content: message });
+    conversationHistory.push({ role: 'assistant', content: reply });
+
+    if (conversationHistory.length > 12) {
+      conversationHistory = conversationHistory.slice(-12);
     }
-
-    chatInput.addEventListener('focus', () => chatInput.removeAttribute('readonly'));
-    chatLauncher.addEventListener('click', () => setOpen(chatPanel.dataset.open !== 'true'));
-    chatClose.addEventListener('click', () => setOpen(false));
-    document.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && chatPanel.dataset.open === 'true') setOpen(false);
-    });
-
-    positionAboveBottomBar();
-    window.addEventListener('resize', positionAboveBottomBar);
-    window.addEventListener('load', positionAboveBottomBar);
-
-    chatForm.addEventListener('submit', async event => {
-      event.preventDefault();
-      const message = chatInput.value.trim();
-      if (!message) return;
-
-      appendUserMessage(message);
-      chatInput.value = '';
-      chatInput.disabled = true;
-
-      const sendButton = chatForm.querySelector('.chat-send');
-      const previousButtonText = sendButton.textContent;
-      sendButton.disabled = true;
-      sendButton.textContent = '...';
-
-      try {
-        const reply = await getReply(message);
-        appendBotMessage(reply);
-      } catch (error) {
-        appendBotMessage(error.message || 'Sorry — the chat service is temporarily unavailable. Please try again or text Gopher directly.');
-        console.error(error);
-      } finally {
-        chatInput.disabled = false;
-        sendButton.disabled = false;
-        sendButton.textContent = previousButtonText;
-        chatInput.focus();
-      }
-    });
+  } catch (error) {
+    appendBotMessage(
+      error.message || 'Sorry — the chat service is temporarily unavailable. Please try again or text Gopher directly.'
+    );
+    console.error(error);
+  } finally {
+    chatInput.disabled = false;
+    sendButton.disabled = false;
+    sendButton.textContent = previousButtonText;
+    chatInput.focus();
+  }
+});
   </script>
 </body>
 </html>
