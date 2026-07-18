@@ -280,9 +280,9 @@
     chatClose.addEventListener('click', () => setOpen(false));
     document.addEventListener('keydown', event => { if (event.key === 'Escape' && chatPanel.dataset.open === 'true') { setOpen(false); } });
     const CHATBOT_API_URL = '/api/chat';
-    async function getReply(message) { const response = await fetch(CHATBOT_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message }) }); if (!response.ok) { throw new Error('Chatbot request failed.'); } const data = await response.json(); return data.reply || 'Sorry, I could not generate a reply just now.'; }
+    async function getReply(text) { const response = await fetch(CHATBOT_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) }); if (!response.ok) { throw new Error('Chatbot request failed.'); } const data = await response.json(); return data.reply || 'Sorry, I could not generate a reply just now.'; }
     positionAboveBottomBar(); window.addEventListener('resize', positionAboveBottomBar); window.addEventListener('load', positionAboveBottomBar);
-    chatForm.addEventListener('submit', async event => { event.preventDefault(); const message = chatInput.value.trim(); if (!message) return; appendUserMessage(message); chatInput.value = ''; try { const reply = await getReply(message); appendBotMessage(reply); } catch (error) { appendBotMessage('Sorry — the chat service is temporarily unavailable. Please try again or text Gopher directly.'); console.error(error); } });
+    chatForm.addEventListener('submit', async event => { event.preventDefault(); const message = chatInput.value.trim(); if (!message) return; appendUserMessage(message); chatInput.value = ''; try { const reply = await getReply(text); appendBotMessage(reply); } catch (error) { appendBotMessage('Sorry — the chat service is temporarily unavailable. Please try again or text Gopher directly.'); console.error(error); } });
   </script>
 </body>
 </html>
