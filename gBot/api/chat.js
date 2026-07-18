@@ -63,18 +63,36 @@ function outdoorRate(sqft) {
   return 7.5;
 }
 
+function buildDetailsFromMessageAndHistory(message, history = []) {
+  const current = parseProjectDetails(message);
+  const recentText = history.slice(-6).map(m => m?.content || '').join(' ').toLowerCase();
+  const recent = parseProjectDetails(recentText);
+
+  const hasCurrentType = current.isPaintJob || current.isFlooringJob || current.isOutdoorBuild;
+
+  return {
+    lower: current.lower,
+    rooms: current.rooms ?? recent.rooms,
+    sqft: current.sqft ?? recent.sqft,
+    isPaintJob: current.isPaintJob || (!hasCurrentType && recent.isPaintJob),
+    isFlooringJob: current.isFlooringJob || (!hasCurrentType && recent.isFlooringJob),
+    isOutdoorBuild: current.isOutdoorBuild || (!hasCurrentType && recent.isOutdoorBuild)
+  };
+}
+
 function localEstimateReply(message, history = []) {
-  const combinedText = [...history.map(m => m?.content || ''), message].join(' ').toLowerCase();
-  const details = parseProjectDetails(combinedText);
+  const details = buildDetailsFromMessageAndHistory(message, history);
 
   if (details.isPaintJob) {
     if (details.rooms && details.rooms > 1 && !details.sqft) {
       return 'For more than one room, please send the total square footage.';
     }
+
     if (details.sqft) {
       const { low, high } = getRateRange(paintRate(details.sqft));
       return `Estimated price range: $${low} to $${high} per sq ft.`;
     }
+
     return 'For paint, please send the number of rooms or total square footage.';
   }
 
@@ -83,6 +101,7 @@ function localEstimateReply(message, history = []) {
       const { low, high } = getRateRange(floorRate(details.sqft));
       return `Estimated price range: $${low} to $${high} per sq ft.`;
     }
+
     return 'For tile, LVP, or flooring, please send the total square footage.';
   }
 
@@ -91,6 +110,7 @@ function localEstimateReply(message, history = []) {
       const { low, high } = getRateRange(outdoorRate(details.sqft));
       return `Estimated price range: $${low} to $${high} per sq ft.`;
     }
+
     return 'For patio, decking, concrete, or hardscape work, please send the total square footage.';
   }
 
