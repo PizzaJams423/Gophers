@@ -252,7 +252,7 @@
   </section>
 
   <script>
-    const IMG = { logo: 'file_00000000c3f861f9a55091d9ba0f1f3d.png', general: 'file_00000000e0d46230b0cb3139ec953033.png', lawn: 'file_00000000061c62309954b4094aabf893.png', mechanic: 'file_00000[...]
+    const IMG = { logo: 'file_00000000c3f861f9a55091d9ba0f1f3d.png', general: 'file_00000000e0d46230b0cb3139ec953033.png', lawn: 'file_00000000061c62309954b4094aabf893.png', mechanic: 'file_000000003f[...]
     const SERVICES = [
       { key:'general', title:'General Maintenance', hero:IMG.general, list:['Doors: hinge/strike adjustments, latch/lock installs, weatherstripping, thresholds','Drywall & Paint: patch holes, texture [...]
       { key:'lawn', title:'Lawn & Outdoor', hero:IMG.lawn, list:['Trimming/weed‑eating & edging; hedge/bush shaping','Flowerbeds: design/build, edging, soil amending, mulch install','Planters & Rais[...]
@@ -279,19 +279,10 @@
     chatLauncher.addEventListener('click', () => { setOpen(chatPanel.dataset.open !== 'true'); });
     chatClose.addEventListener('click', () => setOpen(false));
     document.addEventListener('keydown', event => { if (event.key === 'Escape' && chatPanel.dataset.open === 'true') { setOpen(false); } });
-    const API_BASE = 'https://gbot-vs3h.onrender.com';
-    const SESSION_KEY = 'gopherbot_session_id';
-    function getSessionId() {
-      let id = localStorage.getItem(SESSION_KEY);
-      if (!id) {
-        id = 'session_' + Date.now();
-        localStorage.setItem(SESSION_KEY, id);
-      }
-      return id;
-    }
-    async function getReply(message) { const response = await fetch(API_BASE + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session_id: getSessionId(), text: message }) }); if (!response.ok) { throw new Error('Chatbot request failed.'); } const data = await response.json(); return data.question || data.estimate?.low || 'Got it.'; }
+    const CHATBOT_API_URL = '/api/chat';
+    async function getReply(message) { const response = await fetch(CHATBOT_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message }) }); if (!respo[...]
     positionAboveBottomBar(); window.addEventListener('resize', positionAboveBottomBar); window.addEventListener('load', positionAboveBottomBar);
-    chatForm.addEventListener('submit', async event => { event.preventDefault(); const message = chatInput.value.trim(); if (!message) return; appendUserMessage(message); chatInput.value = ''; try { const reply = await getReply(message); appendBotMessage(reply); } catch (error) { appendBotMessage('Sorry — the chat service is temporarily unavailable. Please try again or text Gopher directly.'); console.error(error); } });
+    chatForm.addEventListener('submit', async event => { event.preventDefault(); const message = chatInput.value.trim(); if (!message) return; appendUserMessage(message); chatInput.value = ''; try { c[...]
   </script>
 </body>
 </html>
