@@ -370,12 +370,23 @@
       scrollChatToBottom();
     }
 
-    async function getReply(message) {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message })
-      });
+let conversationHistory = [];
+
+    async function getReply(message, history) {
+  const response = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message, history })
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.reply || 'Chatbot request failed.');
+  }
+
+  return data.reply || 'Sorry, I could not generate a reply just now.';
+}
 
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
