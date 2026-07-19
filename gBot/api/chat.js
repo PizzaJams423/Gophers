@@ -25,16 +25,15 @@ function parseProjectDetails(message) {
   const roomMatch = lower.match(/(d+(?:.d+)?)s*rooms?\b/);
   const sqftMatch = lower.match(/(d+(?:.d+)?)s*(?:sqs*ft|squares*feet|sqft|sf)\b/);
 
-  const sqft = sqftMatch ? Number(sqftMatch[1]) : null;
-  const rooms = roomMatch ? Number(roomMatch[1]) : null;
-
   return {
     lower,
-    rooms,
-    sqft,
+    rooms: roomMatch ? Number(roomMatch[1]) : null,
+    sqft: sqftMatch ? Number(sqftMatch[1]) : null,
     isPaintJob: /\b(paint|painting|drywall|trim)\b/.test(lower),
     isFlooringJob: /\b(tile|lvp|flooring|floor)\b/.test(lower),
-    isOutdoorBuild: /\b(patio|deck|decking|concrete|hardscape)\b/.test(lower)
+    isOutdoorBuild: /\b(patio|deck|decking|concrete|hardscape)\b/.test(lower),
+    mentionsOnlySqft: !/\b(paint|painting|drywall|trim|tile|lvp|flooring|floor|patio|deck|decking|concrete|hardscape)\b/.test(lower) &&
+      /(d+(?:.d+)?)s*(?:sqs*ft|squares*feet|sqft|sf)\b/.test(lower)
   };
 }
 
@@ -63,60 +62,6 @@ function outdoorRate(sqft) {
   return 7.5;
 }
 
-function buildDetailsFromMessageAndHistory(message, history = []) {
-  const current = parseProjectDetails(message);
-  const recentText = history.slice(-6).map(m => m?.content || '').join(' ').toLowerCase();
-  const recent = parseProjectDetails(recentText);
-
-  const hasCurrentType = current.isPaintJob || current.isFlooringJob || current.isOutdoorBuild;
-
-  return {
-    lower: current.lower,
-    rooms: current.rooms ?? recent.rooms,
-    sqft: current.sqft ?? recent.sqft,
-    isPaintJob: current.isPaintJob || (!hasCurrentType && recent.isPaintJob),
-    isFlooringJob: current.isFlooringJob || (!hasCurrentType && recent.isFlooringJob),
-    isOutdoorBuild: current.isOutdoorBuild || (!hasCurrentType && recent.isOutdoorBuild)
-  };
-}
-
-function localEstimateReply(message, history = []) {
-  const details = buildDetailsFromMessageAndHistory(message, history);
-
-  if (details.isPaintJob) {
-    if (details.rooms && details.rooms > 1 && !details.sqft) {
-      return 'For more than one room, please send the total square footage.';
-    }
-
-    if (details.sqft) {
-      const { low, high } = getRateRange(paintRate(details.sqft));
-      return `Estimated price range: $${low} to $${high} per sq ft.`;
-    }
-
-    return 'For paint, please send the number of rooms or total square footage.';
-  }
-
-  if (details.isFlooringJob) {
-    if (details.sqft) {
-      const { low, high } = getRateRange(floorRate(details.sqft));
-      return `Estimated price range: $${low} to $${high} per sq ft.`;
-    }
-
-    return 'For tile, LVP, or flooring, please send the total square footage.';
-  }
-
-  if (details.isOutdoorBuild) {
-    if (details.sqft) {
-      const { low, high } = getRateRange(outdoorRate(details.sqft));
-      return `Estimated price range: $${low} to $${high} per sq ft.`;
-    }
-
-    return 'For patio, decking, concrete, or hardscape work, please send the total square footage.';
-  }
-
-  return null;
-}
-
 function sanitizeHistory(history) {
   if (!Array.isArray(history)) return [];
 
@@ -135,7 +80,60 @@ function sanitizeHistory(history) {
     }));
 }
 
-export default async function handler(req, res) {
+function getLastUserMessage(history) {
+  for (let i = history.length - 1; i >= 0; i--) {
+    if (history[i].role === 'user') return history[i].content;
+  }
+  return '';
+}
+
+function localEstimateReply(message, history = []) {
+  const current = parseProjectDetails(message);
+  const lastUserMessage = getLastUserMessage(history);
+  const lastUser = parseProjectDetails(lastUserMessage);
+
+  const inferredPaint = current.mentionsOnlySqft && lastUser.isPaintJob;
+  const inferredFloor = current.mentionsOnlySqft && lastUser.isFlooringJob;
+  const inferredOutdoor = current.mentionsOnlySqft && lastUser.isOutdoorBuild;
+
+  if (current.isPaintJob || inferredPaint) {
+    const rooms = current.rooms ?? lastUser.rooms;
+    const sqft = current.sqft ?? lastUser.sqft;
+
+    if (rooms && rooms > 1 && !sqft) {
+      return 'For more than one room, please send the total square footage.';
+    }
+    if (sqft) {
+      const { low, high } = getRateRange(paintRate(sqft));
+      return `Estimated price range: $${low} to $${high} per sq ft.`;
+    }
+    return 'For paint, please send the number of rooms or total square footage.';
+  }
+
+  if (current.isFlooringJob || inferredFloor) {
+    const sqft = current.sqft ?? lastUser.sqft;
+
+    if (sqft) {
+      const { low, high } = getRateRange(floorRate(sqft));
+      return `Estimated price range: $${low} to $${high} per sq ft.`;
+    }
+    return 'For tile, LVP, or flooring, please send the total square footage.';
+  }
+
+  if (current.isOutdoorBuild || inferredOutdoor) {
+    const sqft = current.sqft ?? lastUser.sqft;
+
+    if (sqft) {
+      const { low, high } = getRateRange(outdoorRate(sqft));
+      return `Estimated price range: $${low} to $${high} per sq ft.`;
+    }
+    return 'For patio, decking, concrete, or hardscape work, please send the total square footage.';
+  }
+
+  return null;
+}
+
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ reply: 'Method not allowed.' });
@@ -195,4 +193,4 @@ export default async function handler(req, res) {
     console.error('Chat API error:', error);
     return res.status(500).json({ reply: 'Something went wrong on the server.' });
   }
-}
+};
